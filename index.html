@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>QiQ — Bombas Intelligence Briefing</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── TOKENS ── */
+:root {
+  --dark:    #1a1a2e;
+  --dark2:   #2e2e4a;
+  --red:     #c0392b;
+  --green:   #1a7a4a;
+  --bg:      #f5f5f3;
+  --white:   #ffffff;
+  --border:  #e5e5e2;
+  --text:    #1a1a2e;
+  --muted:   #6b6b6b;
+  --light:   #9b9b9b;
+  --amber:   #d97706;
+  --blue:    #1d4ed8;
+  --purple:  #7c3aed;
+  --honey:   #f59e0b;
+}
+
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.page > * { animation: fadeUp 0.3s ease both; }
+.page > *:nth-child(2) { animation-delay: 0.05s; }
+.page > *:nth-child(3) { animation-delay: 0.10s; }
+.page > *:nth-child(4) { animation-delay: 0.15s; }
+.page > *:nth-child(5) { animation-delay: 0.20s; }
+.page > *:nth-child(6) { animation-delay: 0.25s; }
+.page > *:nth-child(7) { animation-delay: 0.30s; }
+
+/* ── NAV ── */
+nav {
+  background: var(--white);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 32px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand { display: flex; align-items: center; gap: 14px; }
+/* qiq-logo text replaced by image */
+.nav-divider { width: 1px; height: 22px; background: var(--border); }
+.bombas-brand { display: flex; align-items: center; gap: 8px; }
+.bombas-wordmark {
+  display: inline-flex; align-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px; font-weight: 900; letter-spacing: -0.05em;
+  color: #050505; line-height: 1; text-transform: uppercase;
+}
+.bombas-wordmark .o {
+  position: relative; display: inline-block; margin: 0 0.5px;
+}
+.bombas-wordmark .o::after {
+  content: ''; position: absolute; width: 3px; height: 3px; border-radius: 50%;
+  background: #f2b705; left: 50%; top: 50%; transform: translate(-50%, -50%);
+}
+.nav-meta { font-size: 12px; color: var(--light); font-weight: 400; }
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.btn-export {
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--muted); background: none; border: 0.5px solid var(--border);
+  padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.btn-export:hover { background: var(--bg); color: var(--dark); }
+
+
+/* ── HAMBURGER MODULE MENU ── */
+.menu-wrap { position: relative; }
+.menu-trigger {
+  width: 32px; height: 32px; border-radius: 7px;
+  border: 0.5px solid var(--border); background: var(--white);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; color: var(--muted);
+}
+.menu-trigger:hover { background: var(--bg); color: var(--dark); border-color: #c9c9c4; }
+.menu-trigger span, .menu-trigger span::before, .menu-trigger span::after {
+  display: block; width: 14px; height: 1.5px; background: currentColor; border-radius: 2px; content: ''; position: relative;
+}
+.menu-trigger span::before { position: absolute; top: -5px; left: 0; }
+.menu-trigger span::after { position: absolute; top: 5px; left: 0; }
+.menu-panel {
+  display: none; position: absolute; top: 40px; left: 0; width: 260px;
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(26,26,46,0.14); padding: 10px; z-index: 500;
+}
+.menu-panel.open { display: block; }
+.menu-heading {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--light); padding: 8px 10px 7px;
+}
+.menu-link {
+  display: block; text-decoration: none; border: 0.5px solid transparent; border-radius: 8px;
+  padding: 10px 11px; transition: all 0.15s;
+}
+.menu-link:hover { background: var(--bg); border-color: var(--border); }
+.menu-link-title { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+.menu-link-sub { font-size: 11px; color: var(--muted); line-height: 1.35; }
+.menu-sep { height: 0.5px; background: var(--border); margin: 6px 0; }
+
+/* ── PAGE SWITCHER ── */
+.page-view { display: none; }
+.page-view.active { display: block; }
+.menu-link-active { background: var(--bg); border-color: var(--border) !important; }
+
+/* ── PAGE CONTAINER ── */
+.page { max-width: 1300px; margin: 0 auto; padding: 32px 32px 80px; }
+
+/* ── ROLE PAGE SHARED ── */
+.rp-header { margin-bottom: 28px; }
+.rp-title { font-size: 24px; font-weight: 700; color: var(--dark); letter-spacing: -0.5px; margin-bottom: 4px; }
+.rp-subtitle { font-size: 13px; color: var(--muted); }
+.rp-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 14px; }
+.rp-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 14px; }
+.rp-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.rp-stat-card { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 16px 18px; text-align: center; }
+.rp-stat-val { font-size: 32px; font-weight: 700; color: var(--dark); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+.rp-stat-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--light); margin-bottom: 3px; }
+.rp-stat-sub { font-size: 11px; color: var(--muted); }
+
+/* KPI tile grid */
+.kpi-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.kpi-tile { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 12px 14px; flex: 1; min-width: 100px; cursor: pointer; transition: all 0.15s; }
+.kpi-tile:hover, .kpi-tile.active { border-color: var(--dark); box-shadow: 0 0 0 1px var(--dark); }
+.kpi-tile-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--light); margin-bottom: 5px; }
+.kpi-tile-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
+.kpi-tile-chg { font-size: 11px; font-weight: 500; }
+
+/* Issue rows */
+.issue-row { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+.issue-sev { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; min-height: 32px; }
+.issue-body { flex: 1; min-width: 0; }
+.issue-title { font-size: 13px; font-weight: 500; color: var(--dark); line-height: 1.4; margin-bottom: 5px; }
+.issue-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.issue-right { flex-shrink: 0; width: 72px; text-align: right; }
+.issue-vol { font-size: 18px; font-weight: 700; display: block; line-height: 1.2; }
+.issue-vol-lbl { font-size: 10px; color: var(--light); display: block; margin-top: 1px; }
+
+/* NBA rows */
+.nba-row { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 16px 18px; margin-bottom: 8px; display: flex; gap: 14px; align-items: flex-start; }
+.nba-num { font-size: 13px; font-weight: 700; color: var(--light); width: 16px; flex-shrink: 0; padding-top: 2px; }
+.nba-body { flex: 1; min-width: 0; }
+.nba-title { font-size: 13px; font-weight: 500; color: var(--dark); line-height: 1.4; margin-bottom: 4px; }
+.nba-detail { font-size: 12px; color: var(--muted); line-height: 1.4; margin-bottom: 8px; }
+.nba-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.nba-impact { flex-shrink: 0; width: 88px; text-align: right; }
+.nba-impact-val { font-size: 16px; font-weight: 700; display: block; line-height: 1.2; }
+.nba-impact-lbl { font-size: 11px; color: var(--light); display: block; margin-top: 1px; }
+
+/* Tags */
+.tag { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+.tag-red    { background: #fef2f2; color: var(--red);    border: 0.5px solid #fecaca; }
+.tag-green  { background: #f0fdf4; color: var(--green);  border: 0.5px solid #bbf7d0; }
+.tag-amber  { background: #fffbeb; color: var(--amber);  border: 0.5px solid #fde68a; }
+.tag-blue   { background: #eff6ff; color: var(--blue);   border: 0.5px solid #bfdbfe; }
+.tag-purple { background: #f5f3ff; color: var(--purple); border: 0.5px solid #ddd6fe; }
+.tag-dark   { background: var(--dark); color: #fff; border: none; }
+.tag-muted  { background: var(--bg); color: var(--muted); border: 0.5px solid var(--border); }
+
+/* Pulse dark card */
+.pulse { background: var(--dark2); border-radius: 10px; padding: 22px 26px; margin-bottom: 14px; display: flex; gap: 24px; align-items: flex-start; }
+.pulse-left { flex: 1; }
+.pulse-date { font-size: 11px; color: rgba(255,255,255,0.35); margin-bottom: 7px; }
+.pulse-headline { font-size: 15px; font-weight: 500; color: rgba(255,255,255,0.85); line-height: 1.55; max-width: 640px; margin-bottom: 14px; }
+.pulse-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.pulse-chip { display: flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.07); border: 0.5px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 5px; }
+.pulse-dot { width: 5px; height: 5px; border-radius: 50%; }
+.pulse-right { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+.pulse-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pulse-kpi { background: rgba(255,255,255,0.07); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px 12px; }
+.pulse-kpi-lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.pulse-kpi-val { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+.pulse-kpi-chg { font-size: 11px; font-weight: 500; }
+
+/* Period tabs */
+.period-tabs { display: flex; gap: 0; margin-bottom: 14px; border-radius: 8px; overflow: hidden; border: 0.5px solid var(--border); background: var(--white); }
+.period-tab { flex: 1; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); background: none; border: none; border-right: 0.5px solid var(--border); padding: 10px 6px; cursor: pointer; transition: all 0.15s; }
+.period-tab:last-child { border-right: none; }
+.period-tab:hover { background: var(--bg); color: var(--dark); }
+.period-tab.active { background: var(--dark); color: #fff; font-weight: 600; }
+
+/* Chart card */
+.chart-card { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.chart-title { font-size: 12px; font-weight: 600; color: var(--dark); }
+.chart-period { font-size: 11px; color: var(--light); }
+.chart-h-md { height: 160px; position: relative; }
+.chart-h-sm { height: 100px; position: relative; }
+
+/* Agent table */
+.agent-table { width: 100%; border-collapse: collapse; }
+.agent-table th { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--light); padding: 10px 12px; text-align: left; border-bottom: 0.5px solid var(--border); }
+.agent-table td { font-size: 12px; color: var(--dark); padding: 11px 12px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+.agent-table tr:last-child td { border-bottom: none; }
+.agent-table tr:hover td { background: #fafaf9; }
+.agent-name { font-weight: 500; display: flex; align-items: center; gap: 7px; }
+.agent-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+
+/* Call feedback row */
+.call-row { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 14px; align-items: flex-start; }
+.call-score-num { font-size: 15px; font-weight: 700; line-height: 1; }
+.call-score { width: 44px; height: 44px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.score-green { background: #f0fdf4; color: var(--green); }
+.score-amber { background: #fffbeb; color: var(--amber); }
+.score-red   { background: #fef2f2; color: var(--red); }
+.call-id { font-size: 10px; font-weight: 600; color: var(--light); letter-spacing: 0.04em; margin-bottom: 3px; }
+.call-body { flex: 1; }
+.call-text { font-size: 12px; color: var(--dark); line-height: 1.45; margin-bottom: 5px; }
+.call-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+
+/* Hero personal card */
+.agent-hero { background: var(--dark2); border-radius: 10px; padding: 22px 26px; margin-bottom: 14px; display: flex; gap: 22px; align-items: center; }
+.agent-hero-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--red); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.agent-hero-info { flex: 1; }
+.agent-hero-name { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+.agent-hero-role { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+.agent-hero-stats { display: flex; gap: 20px; }
+.agent-hero-stat-val { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+.agent-hero-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+.agent-hero-rank { text-align: right; }
+.agent-rank-num { font-size: 36px; font-weight: 700; color: #fff; letter-spacing: -2px; line-height: 1; }
+.agent-rank-lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* QA matrix */
+.qa-matrix { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 14px; }
+.qa-matrix-cell { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 14px 16px; text-align: center; }
+.qa-matrix-icon { font-size: 20px; margin-bottom: 6px; }
+.qa-matrix-num { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin-bottom: 3px; }
+.qa-matrix-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--light); margin-bottom: 3px; }
+.qa-matrix-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+/* AM client card */
+.am-client-card { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 16px 18px; cursor: pointer; transition: all 0.15s; }
+.am-client-card:hover { border-color: #bbb; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.am-client-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+.am-client-name { font-size: 14px; font-weight: 600; color: var(--dark); }
+.am-client-sector { font-size: 11px; color: var(--light); margin-top: 2px; }
+.am-client-score { font-size: 30px; font-weight: 700; color: var(--dark); letter-spacing: -1px; line-height: 1; }
+.am-client-score-lbl { font-size: 10px; color: var(--light); text-transform: uppercase; letter-spacing: 0.06em; }
+.am-client-metrics { display: flex; gap: 14px; }
+.am-client-metric-val { font-size: 13px; font-weight: 600; color: var(--dark); }
+.am-client-metric-lbl { font-size: 10px; color: var(--light); text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Nav active pill */
+.nav-page-label { font-size: 11px; font-weight: 600; color: var(--dark); background: var(--bg); border: 0.5px solid var(--border); border-radius: 4px; padding: 3px 9px; }
+
+
+/* ── PAGE HEADER ── */
+.briefing-header {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+  margin: 4px 0 28px;
+}
+.briefing-kicker {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 7px;
+}
+.briefing-title {
+  font-size: 34px; font-weight: 700; color: var(--dark); letter-spacing: -1.2px; line-height: 1.05;
+}
+.briefing-subtitle {
+  margin-top: 8px; font-size: 14px; color: var(--muted); line-height: 1.45; max-width: 720px;
+}
+.briefing-meta-card {
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 8px;
+  padding: 12px 16px; min-width: 230px; text-align: right;
+}
+.briefing-meta-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); margin-bottom: 4px; }
+.briefing-meta-value { font-size: 13px; font-weight: 600; color: var(--dark); }
+
+/* ── CONNECTOR / SECTION HEADINGS ── */
+.connector {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 15px; font-style: normal; color: var(--dark);
+  margin: 0 0 14px; font-weight: 800; letter-spacing: -0.015em;
+}
+.connector::before {
+  content: ''; width: 4px; height: 22px; border-radius: 4px; background: var(--red); flex-shrink: 0;
+}
+.connector::after {
+  content: ''; height: 1px; background: var(--border); flex: 1; min-width: 40px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--light); margin-bottom: 12px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: var(--dark2);
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1px 260px;
+  gap: 32px;
+  align-items: center;
+  position: relative;
+  overflow: visible;
+}
+/* subtle hex pattern overlay */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64'%3E%3Cpath d='M28 2 L52 16 L52 48 L28 62 L4 48 L4 16 Z' fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+.hero-left { position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 14px;
+}
+.hero-headline {
+  font-size: 18px; font-weight: 400; color: rgba(255,255,255,0.88);
+  line-height: 1.65; margin-bottom: 22px;
+}
+.hero-headline strong { color: #fff; font-weight: 700; }
+.hero-headline .hl-red { color: #fca5a5; font-weight: 700; }
+.hero-headline .hl-green { color: #4ade80; font-weight: 700; }
+.hero-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.hero-chip {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 5px 11px; border-radius: 5px;
+}
+.chip-red   { color: #fca5a5; background: rgba(192,57,43,0.18); border: 0.5px solid rgba(192,57,43,0.3); }
+.chip-green { color: #4ade80; background: rgba(74,222,128,0.12); border: 0.5px solid rgba(74,222,128,0.22); }
+.chip-amber { color: #fbbf24; background: rgba(251,191,36,0.12); border: 0.5px solid rgba(251,191,36,0.22); }
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+.hero-divider { background: rgba(255,255,255,0.08); border-radius: 1px; align-self: stretch; }
+
+.hero-right {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+.score-wrap { position: relative; width: 130px; height: 130px; cursor: pointer; }
+.score-wrap canvas { position: absolute; top: 0; left: 0; }
+.score-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  transform: translateY(5px);
+}
+.score-num { font-size: 44px; font-weight: 700; color: white; letter-spacing: -3px; line-height: 1; }
+.score-lbl-row { display: flex; align-items: center; gap: 5px; }
+.score-lbl { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.07em; }
+.score-info-btn {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.3);
+  font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; font-style: normal; position: relative;
+}
+.score-info-btn:hover { border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); }
+
+/* TOOLTIP */
+.score-tooltip {
+  display: none;
+  position: absolute;
+  top: -112px; right: 24px;
+  width: 260px;
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 5000;
+  margin-top: 0;
+}
+.score-info-btn:hover .score-tooltip { display: block; }
+.score-tooltip-title { font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 8px; font-style: normal; }
+.score-tooltip-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 4px 0; border-bottom: 0.5px solid var(--border); font-size: 11px; }
+.score-tooltip-row:last-of-type { border-bottom: none; }
+.score-tooltip-kpis { color: var(--muted); }
+.score-tooltip-wt { font-weight: 700; color: var(--dark); flex-shrink: 0; margin-left: 8px; }
+.score-tooltip-ranges { margin-top: 10px; padding-top: 8px; border-top: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
+.score-tooltip-range { font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.score-tooltip-range-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.score-status-row { display: flex; align-items: center; gap: 8px; }
+.score-status { font-size: 12px; font-weight: 600; color: var(--honey); }
+.score-vel { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* ── SHARED CARD ── */
+.card { background: var(--white); border: 0.5px solid var(--border); border-radius: 8px; padding: 20px 22px; }
+
+/* ── TREND ROW ── */
+.trend-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 10px; }
+.trend-card {
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 8px;
+  padding: 16px 18px; cursor: pointer; transition: all 0.15s;
+}
+.trend-card:hover { border-color: #b0b0aa; box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+.trend-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.trend-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); margin-bottom: 4px; }
+.trend-val { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--dark); line-height: 1; }
+.trend-chg { font-size: 12px; font-weight: 500; margin-top: 3px; }
+.trend-drill { font-size: 11px; color: var(--light); transition: color 0.15s; }
+.trend-card:hover .trend-drill { color: var(--dark); }
+
+/* ── FINANCIAL ROW ── */
+.fin-row { display: grid; grid-template-columns: 1fr 1fr 280px; gap: 14px; margin-bottom: 10px; }
+.fin-card {
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 8px;
+  padding: 18px 20px; cursor: pointer; transition: all 0.15s;
+}
+.fin-card:hover { border-color: #b0b0aa; box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+.fin-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.fin-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); }
+.fin-drill { font-size: 11px; color: var(--light); transition: color 0.15s; }
+.fin-card:hover .fin-drill { color: var(--dark); }
+.fin-body { display: flex; gap: 16px; align-items: center; }
+.donut-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+.donut-wrap canvas { position: absolute; top: 0; left: 0; }
+.donut-centre {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.donut-total { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+.donut-total-lbl { font-size: 10px; color: var(--light); margin-top: 2px; }
+.fin-legend { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.leg-item { display: flex; align-items: center; gap: 7px; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.leg-label { font-size: 11px; color: var(--muted); flex: 1; }
+.leg-val { font-size: 12px; font-weight: 600; }
+.leg-divider { height: 0.5px; background: var(--border); margin: 3px 0; }
+
+/* NET CARD */
+.net-card {
+  background: linear-gradient(135deg, #252541 0%, #1f1f36 100%);
+  border: 0.5px solid rgba(255,255,255,0.10);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  padding: 22px 24px;
+  display: flex; flex-direction: column; justify-content: center;
+  box-shadow: 0 8px 24px rgba(26,26,46,0.14);
+}
+.net-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.52); margin-bottom: 8px; }
+.net-val { font-size: 36px; font-weight: 700; color: white; letter-spacing: -2px; line-height: 1; margin-bottom: 4px; }
+.net-sub { font-size: 12px; color: rgba(255,255,255,0.62); margin-bottom: 18px; }
+.net-divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 14px; }
+.net-deploy-lbl { font-size: 10px; color: rgba(255,255,255,0.52); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.net-deploy-val { font-size: 22px; font-weight: 700; color: #4ade80; letter-spacing: -0.5px; line-height: 1; margin-bottom: 2px; }
+.net-deploy-sub { font-size: 11px; color: rgba(255,255,255,0.56); }
+
+/* ── BI ROW ── */
+.bi-row { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 14px; margin-bottom: 10px; }
+.bi-card {
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 8px;
+  padding: 18px 20px; cursor: pointer; transition: all 0.15s;
+}
+.bi-card:hover { border-color: #b0b0aa; box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+.bi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.bi-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); }
+.bi-drill { font-size: 11px; color: var(--light); transition: color 0.15s; }
+.bi-card:hover .bi-drill { color: var(--dark); }
+.bi-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid var(--border); }
+.bi-item:first-of-type { padding-top: 0; }
+.bi-item:last-of-type { border-bottom: none; padding-bottom: 0; }
+.bi-rank { font-size: 11px; font-weight: 700; color: var(--light); width: 14px; flex-shrink: 0; }
+.bi-name { font-size: 12px; color: var(--dark); flex: 1; font-weight: 500; line-height: 1.3; }
+.bi-bar-wrap { width: 48px; height: 4px; background: var(--border); border-radius: 2px; flex-shrink: 0; }
+.bi-bar { height: 100%; border-radius: 2px; }
+.bi-count { font-size: 11px; font-weight: 600; color: var(--muted); flex-shrink: 0; min-width: 24px; text-align: right; }
+.bi-flag { font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 3px; flex-shrink: 0; }
+.flag-red    { background: #fef2f2; color: var(--red); }
+.flag-amber  { background: #fffbeb; color: var(--amber); }
+.flag-green  { background: #f0fdf4; color: var(--green); }
+.bench-item { margin-bottom: 10px; }
+.bench-item:last-child { margin-bottom: 0; }
+.bench-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.bench-name { font-size: 12px; color: var(--muted); }
+.bench-you { font-size: 12px; font-weight: 700; }
+.bench-track { height: 7px; background: var(--border); border-radius: 4px; position: relative; overflow: visible; }
+.bench-fill { height: 100%; border-radius: 4px; }
+.bench-marker { position: absolute; top: -4px; width: 2px; height: 15px; background: var(--dark); border-radius: 1px; }
+.bench-sub { font-size: 10px; color: var(--light); margin-top: 3px; }
+.cap-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.cap-row:last-child { border-bottom: none; }
+.cap-label { font-size: 12px; color: var(--muted); }
+.cap-val { font-size: 14px; font-weight: 700; }
+
+/* ── BOTTOM ROW ── */
+.bottom-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 10px; }
+.bottom-card {
+  background: var(--white); border: 0.5px solid var(--border); border-radius: 8px;
+  padding: 18px 20px; cursor: pointer; transition: all 0.15s;
+}
+.bottom-card:hover { border-color: #b0b0aa; box-shadow: 0 2px 14px rgba(0,0,0,0.07); }
+.bottom-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.bottom-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--light); }
+.dec-row { display: flex; gap: 8px; align-items: flex-start; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.dec-row:first-of-type { padding-top: 0; }
+.dec-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+.dec-bar { width: 3px; border-radius: 3px; align-self: stretch; min-height: 28px; flex-shrink: 0; }
+.dec-body { flex: 1; }
+.dec-title { font-size: 11px; font-weight: 500; color: var(--dark); line-height: 1.4; margin-bottom: 3px; }
+.dec-type { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 3px; display: inline-block; }
+.type-gov  { background: #f5f3ff; color: var(--purple); }
+.type-prod { background: #fef2f2; color: var(--red); }
+.type-pol  { background: #fffbeb; color: var(--amber); }
+.dec-cost { font-size: 11px; font-weight: 700; color: var(--red); flex-shrink: 0; align-self: center; }
+.nba-row { display: flex; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.nba-row:first-of-type { padding-top: 0; }
+.nba-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+.nba-state { width: 3px; border-radius: 3px; align-self: stretch; min-height: 24px; flex-shrink: 0; }
+.nba-title { font-size: 11px; font-weight: 500; color: var(--dark); flex: 1; line-height: 1.35; }
+.nba-impact { font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.nba-deploy { margin-top: 10px; padding: 9px 12px; background: linear-gradient(135deg, #252541 0%, #1f1f36 100%); border: 0.5px solid rgba(255,255,255,0.10); border-left: 3px solid var(--green); border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
+.nba-deploy-lbl { font-size: 10px; color: rgba(255,255,255,0.58); text-transform: uppercase; letter-spacing: 0.04em; }
+.nba-deploy-val { font-size: 13px; font-weight: 700; color: #4ade80; }
+.voc-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.voc-score-block { background: var(--bg); border: 0.5px solid var(--border); border-radius: 6px; padding: 8px 10px; text-align: center; }
+.voc-score-num { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+.voc-score-lbl { font-size: 9px; color: var(--light); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 1px; }
+.voc-score-chg { font-size: 10px; font-weight: 500; margin-top: 1px; }
+.voc-minichart { height: 42px; position: relative; margin: 6px 0 4px; }
+.voc-quote { font-size: 11px; color: var(--muted); font-style: italic; padding: 6px 0; border-bottom: 0.5px solid var(--border); line-height: 1.45; }
+.voc-quote:last-child { border-bottom: none; padding-bottom: 0; }
+.voc-count { font-size: 10px; color: var(--light); font-style: normal; margin-top: 2px; }
+.watch-row { display: flex; gap: 9px; align-items: flex-start; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.watch-row:first-of-type { padding-top: 0; }
+.watch-row:last-of-type { border-bottom: none; padding-bottom: 0; }
+.watch-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.watch-title { font-size: 11px; font-weight: 500; color: var(--dark); line-height: 1.35; margin-bottom: 2px; }
+.watch-proj { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+.voc-pulse-panel { background: var(--bg); border: 0.5px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+.voc-pulse-title { font-size: 10px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; color: var(--light); margin-bottom: 10px; }
+.voc-pulse-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.voc-pulse-note { font-size: 11px; color: var(--muted); line-height: 1.45; margin-top: 6px; }
+
+
+/* ── MISC TAGS ── */
+.tag { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 3px; }
+.tag-red    { background: #fef2f2; color: var(--red); border: 0.5px solid #fecaca; }
+.tag-green  { background: #f0fdf4; color: var(--green); border: 0.5px solid #bbf7d0; }
+.tag-amber  { background: #fffbeb; color: var(--amber); border: 0.5px solid #fde68a; }
+.tag-blue   { background: #eff6ff; color: var(--blue); border: 0.5px solid #bfdbfe; }
+.tag-purple { background: #f5f3ff; color: var(--purple); border: 0.5px solid #ddd6fe; }
+
+
+/* Drawer assumption editor — aligned label/value rows */
+.drawer-assumption-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.drawer-assumption-row:first-child { padding-top: 0; }
+.drawer-assumption-row:last-child { border-bottom: none; padding-bottom: 0; }
+.drawer-assumption-lbl {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.drawer-assumption-input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--dark);
+  background: var(--white);
+  border: 0.5px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 9px;
+  width: 92px;
+  text-align: right;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.drawer-assumption-input:focus {
+  border-color: var(--dark);
+  box-shadow: 0 0 0 2px rgba(26,26,46,0.06);
+}
+
+/* ── DRAWER ── */
+.drawer-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.25); z-index: 200;
+  backdrop-filter: blur(2px);
+}
+.drawer-overlay.open { display: block; }
+.drawer {
+  position: fixed; top: 0; right: -600px; width: 580px; height: 100vh;
+  background: var(--white); border-left: 0.5px solid var(--border);
+  z-index: 201; overflow-y: auto; transition: right 0.25s cubic-bezier(0.4,0,0.2,1);
+  padding: 28px 28px 60px;
+}
+.drawer.open { right: 0; }
+.drawer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.drawer-title { font-size: 17px; font-weight: 600; color: var(--dark); letter-spacing: -0.2px; }
+.drawer-close {
+  width: 30px; height: 30px; border-radius: 6px;
+  background: var(--bg); border: 0.5px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--muted); transition: background 0.15s;
+}
+.drawer-close:hover { background: var(--border); }
+.drawer-section { margin-bottom: 22px; }
+.drawer-section-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--light); margin-bottom: 12px; }
+.drawer-bucket { background: var(--bg); border: 0.5px solid var(--border); border-radius: 7px; padding: 13px 15px; margin-bottom: 8px; }
+.drawer-bucket:last-child { margin-bottom: 0; }
+.drawer-bucket-val { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
+.drawer-bucket-lbl { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.drawer-bucket-formula { font-size: 11px; color: var(--light); line-height: 1.45; }
+.drawer-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.assumptions { background: var(--bg); border: 0.5px solid var(--border); border-radius: 7px; padding: 14px 15px; }
+.assumption-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.assumption-row:last-child { border-bottom: none; padding-bottom: 0; }
+.assumption-label { font-size: 12px; color: var(--muted); }
+.assumption-input { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--dark); background: var(--white); border: 0.5px solid var(--border); border-radius: 4px; padding: 4px 8px; width: 90px; text-align: right; outline: none; }
+.assumption-input:focus { border-color: var(--dark); }
+.alert-box { padding: 10px 13px; border-radius: 6px; font-size: 12px; line-height: 1.5; margin-bottom: 10px; }
+.alert-red    { background: #fef2f2; border: 0.5px solid #fecaca; color: var(--red); }
+.alert-green  { background: #f0fdf4; border: 0.5px solid #bbf7d0; color: var(--green); }
+.alert-blue   { background: #eff6ff; border: 0.5px solid #bfdbfe; color: var(--blue); }
+.alert-amber  { background: #fffbeb; border: 0.5px solid #fde68a; color: var(--amber); }
+.drawer-verbatim { background: var(--bg); border: 0.5px solid var(--border); border-radius: 7px; padding: 12px 14px; margin-bottom: 8px; }
+.drawer-verbatim:last-child { margin-bottom: 0; }
+.drawer-verbatim-quote { font-size: 13px; font-style: italic; color: var(--dark); margin-bottom: 5px; line-height: 1.45; }
+.drawer-verbatim-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.drawer-verbatim-count { font-size: 11px; color: var(--muted); font-style: normal; }
+.drawer-nba { display: flex; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.drawer-nba:first-of-type { padding-top: 0; }
+.drawer-nba:last-of-type { border-bottom: none; padding-bottom: 0; }
+.drawer-nba-bar { width: 3px; border-radius: 3px; flex-shrink: 0; align-self: stretch; min-height: 36px; }
+.drawer-nba-body { flex: 1; }
+.drawer-nba-week { font-size: 10px; font-weight: 600; color: var(--light); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+.drawer-nba-title { font-size: 13px; font-weight: 500; color: var(--dark); line-height: 1.4; margin-bottom: 3px; }
+.drawer-nba-outcome { font-size: 12px; color: var(--muted); line-height: 1.45; margin-bottom: 5px; }
+.drawer-nba-right { text-align: right; flex-shrink: 0; min-width: 76px; }
+.drawer-nba-impact { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+.drawer-nba-impact-lbl { font-size: 9px; color: var(--light); text-transform: uppercase; letter-spacing: 0.04em; }
+
+.val-red   { color: var(--red); }
+.val-green { color: var(--green); }
+.val-amber { color: var(--amber); }
+.val-blue  { color: var(--blue); }
+.chg-red   { color: var(--red); }
+.chg-green { color: var(--green); }
+
+@media (max-width: 860px) {
+  nav { padding: 0 18px; }
+  .briefing-header { flex-direction: column; align-items: flex-start; }
+  .briefing-title { font-size: 28px; }
+  .briefing-meta-card { text-align: left; width: 100%; }
+  .hero { grid-template-columns: 1fr; gap: 22px; }
+  .hero-divider { display: none; }
+}
+
+
+
+/* ── DECISION DRAWER TYPOGRAPHY POLISH ── */
+.drawer-dec {
+  background: #fafaf9 !important;
+  border: 0.5px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 13px 15px !important;
+  margin-bottom: 10px !important;
+}
+.drawer-dec-title {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.38;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.drawer-dec-why {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.48;
+  margin-bottom: 9px;
+}
+.drawer-dec-footer {
+  padding-top: 1px;
+}
+.drawer-dec-footer .tag {
+  font-size: 10px;
+  padding: 2px 6px;
+}
+.drawer-dec-impact {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em;
+}
+
+</style>
+<style>
+.hamburger-menu,
+.menu-toggle,
+</style></head>
+<body>
+<!-- NAV -->
+<nav>
+<div class="nav-brand">
+<div class="menu-wrap">
+<button aria-controls="module-menu" aria-expanded="false" aria-label="Open QiQ module menu" class="menu-trigger" id="module-menu-trigger">
+<span></span>
+</button>
+<div class="menu-panel" id="module-menu">
+<div class="menu-heading">QiQ Views</div>
+<a class="menu-link menu-link-active" href="#" onclick="showPage('exec');return false;">
+<div class="menu-link-title">Executive Briefing</div>
+<div class="menu-link-sub">Financial impact, decisions, and strategic intelligence.</div>
+</a>
+<div class="menu-sep"></div>
+<div class="menu-heading" style="margin-top:4px">Role Dashboards</div>
+<a class="menu-link" href="#" onclick="showPage('ops');return false;">
+<div class="menu-link-title">Ops Manager</div>
+<div class="menu-link-sub">Issues, KPI performance, and next best actions.</div>
+</a>
+<a class="menu-link" href="#" onclick="showPage('qa');return false;">
+<div class="menu-link-title">QA Analyst</div>
+<div class="menu-link-sub">Quality scoring, critical failures, and review queue.</div>
+</a>
+<a class="menu-link" href="#" onclick="showPage('teamlead');return false;">
+<div class="menu-link-title">Team Lead</div>
+<div class="menu-link-sub">Team matrix, coaching briefs, and call reviews.</div>
+</a>
+<a class="menu-link" href="#" onclick="showPage('agent');return false;">
+<div class="menu-link-title">Agent</div>
+<div class="menu-link-sub">Personal performance, feedback, and focus actions.</div>
+</a>
+<a class="menu-link" href="#" onclick="showPage('am');return false;">
+<div class="menu-link-title">Account Manager</div>
+<div class="menu-link-sub">Client health, ROI tracking, and strategic overview.</div>
+</a>
+<div class="menu-sep"></div>
+<div class="menu-heading" style="margin-top:4px">External Dashboards</div>
+<a class="menu-link" href="https://qiq-karcher-dev.quantanite.com/" rel="noopener noreferrer" target="_blank">
+<div class="menu-link-title">Operations ↗</div>
+<div class="menu-link-sub">Open the live operations intelligence dashboard.</div>
+</a>
+<a class="menu-link" href="https://qiq-cqa-karcher-prod.azurewebsites.net/" rel="noopener noreferrer" target="_blank">
+<div class="menu-link-title">Quality ↗</div>
+<div class="menu-link-sub">Open the live call quality analysis dashboard.</div>
+</a>
+</div>
+</div>
+<div class="nav-divider"></div>
+<img src="data:image/jpeg;base64,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" alt="Quantanite iQ" style="height:22px;width:auto;display:block;filter:none;">
+<div class="nav-divider"></div>
+<div aria-label="Bombas" class="bombas-brand">
+<span class="bombas-wordmark">B<span class="o">O</span>MBAS</span>
+</div>
+<div class="nav-meta">· Week 18 · 28 Apr – 4 May 2026 · 3,241 contacts analysed</div>
+</div>
+<div class="nav-right">
+<span id="nav-page-label" class="nav-page-label">Executive</span>
+<button class="btn-export">
+<svg fill="none" height="13" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+      Export Briefing
+    </button>
+</div>
+</nav>
+<!-- PAGE -->
+<div id="page-exec" class="page-view active">
+<div class="page">
+
+<!-- PAGE HEADING -->
+<header class="briefing-header">
+<div>
+<div class="briefing-kicker">QiQ Client Intelligence</div>
+<h1 class="briefing-title">Bombas Intelligence Briefing</h1>
+<div class="briefing-subtitle">A weekly view of customer contact patterns, financial exposure, revenue opportunity, and the actions that need leadership attention.</div>
+</div>
+<div class="briefing-meta-card">
+<div class="briefing-meta-label">Reporting Period</div>
+<div class="briefing-meta-value">Week 18 · 28 Apr – 4 May 2026</div>
+<div class="briefing-meta-label" style="margin-top:10px">Contacts Analysed</div>
+<div class="briefing-meta-value">3,241</div>
+</div>
+</header>
+
+<!-- HERO -->
+<div class="connector">This week — at a glance.</div>
+<div class="hero" style="margin-bottom:28px">
+<div class="hero-left">
+<div class="hero-eyebrow">AI Health Assessment · Week 18</div>
+<div class="hero-headline">
+  Order fulfilment failures and a customer service breakdown are costing Bombas an estimated <span class="hl-red">$52,400 this week.</span> $61,800 in retention and recovery opportunity is sitting unaddressed in the same contacts.
+</div>
+<div class="hero-chips">
+<div class="hero-chip chip-red"><span class="chip-dot" style="background:#fca5a5"></span>Orders unfulfilled or unacknowledged — 624 contacts this week</div>
+<div class="hero-chip chip-red"><span class="chip-dot" style="background:#fca5a5"></span>CS resolution failure rate 61% — no escalation path exists</div>
+<div class="hero-chip chip-red"><span class="chip-dot" style="background:#fca5a5"></span>Quality complaints ↑ 34% WoW — material change flagged</div>
+<div class="hero-chip chip-amber"><span class="chip-dot" style="background:#fbbf24"></span>Subscription cancels up 22% WoW — 68% are saveable</div>
+</div>
+</div>
+<div class="hero-divider"></div>
+<div class="hero-right">
+<div class="score-wrap">
+<canvas height="130" id="score-ring" width="130"></canvas>
+<div class="score-inner">
+<div class="score-num">54</div>
+<div class="score-lbl-row">
+<span class="score-lbl">Health</span>
+<span class="score-info-btn">i
+<div class="score-tooltip">
+<div class="score-tooltip-title">Health Score — how it's calculated</div>
+<div class="score-tooltip-row"><span class="score-tooltip-kpis">Operations — FCR, RCR, fulfilment rate</span><span class="score-tooltip-wt">40%</span></div>
+<div class="score-tooltip-row"><span class="score-tooltip-kpis">Customer — CSAT, NPS, sentiment</span><span class="score-tooltip-wt">35%</span></div>
+<div class="score-tooltip-row"><span class="score-tooltip-kpis">Risk — critical failures, escalations</span><span class="score-tooltip-wt">25%</span></div>
+<div class="score-tooltip-ranges">
+<div class="score-tooltip-range"><div class="score-tooltip-range-dot" style="background:#1a7a4a"></div>80–100 · Healthy</div>
+<div class="score-tooltip-range"><div class="score-tooltip-range-dot" style="background:#d97706"></div>60–79 · Watch</div>
+<div class="score-tooltip-range"><div class="score-tooltip-range-dot" style="background:#c0392b"></div>Below 60 · At risk</div>
+</div>
+</div>
+</span>
+</div>
+</div>
+</div>
+<div class="score-status-row">
+<span class="score-status">⚠ At Risk</span>
+<span class="score-vel">↓ −5 pts · 4th week declining</span>
+</div>
+</div>
+</div>
+
+<!-- TRENDS -->
+<div class="connector">Here's how the picture has been moving.</div>
+<div class="trend-row" style="margin-bottom:28px">
+<div class="trend-card" onclick="openDrawer('trends')">
+<div class="trend-top"><div>
+<div class="trend-label">Health Score · 12-week</div>
+<div class="trend-val val-red">54</div>
+<div class="trend-chg chg-red">↓ −5 WoW · declining</div>
+</div><div class="trend-drill">Details →</div></div>
+<div style="height:80px;position:relative"><canvas id="chart-health"></canvas></div>
+</div>
+<div class="trend-card" onclick="openDrawer('trends')">
+<div class="trend-top"><div>
+<div class="trend-label">Fulfilment Failure Contacts · 8-week</div>
+<div class="trend-val val-red">624</div>
+<div class="trend-chg chg-red">↑ 4.1× baseline · primary driver</div>
+</div><div class="trend-drill">Details →</div></div>
+<div style="height:80px;position:relative"><canvas id="chart-returns"></canvas></div>
+</div>
+<div class="trend-card" onclick="openDrawer('trends')">
+<div class="trend-top"><div>
+<div class="trend-label">CS Resolution Rate · 8-week</div>
+<div class="trend-val val-red">61%</div>
+<div class="trend-chg chg-red">↓ from 72% · 8 weeks ago</div>
+</div><div class="trend-drill">Details →</div></div>
+<div style="height:80px;position:relative"><canvas id="chart-sentiment"></canvas></div>
+</div>
+</div>
+
+<!-- FINANCIAL -->
+<div class="connector">This is what the current state is costing you each week.</div>
+<div class="fin-row" style="margin-bottom:28px">
+<div class="fin-card" onclick="openDrawer('cost')">
+<div class="fin-card-top">
+<div class="fin-label">Cost Exposure This Week</div>
+<div class="fin-drill">View breakdown →</div>
+</div>
+<div class="fin-body">
+<div class="donut-wrap">
+<canvas height="120" id="cost-donut" width="120"></canvas>
+<div class="donut-centre">
+<div class="donut-total val-red" id="fin-cost-total">$52,400</div>
+<div class="donut-total-lbl">this week</div>
+</div>
+</div>
+<div class="fin-legend">
+<div class="leg-item"><span class="leg-dot" style="background:#c0392b"></span><span class="leg-label">Fulfilment failure cost</span><span class="leg-val val-red" id="leg-returns">$18,600</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#d9534f"></span><span class="leg-label">CS breakdown — repeat contacts</span><span class="leg-val val-red" id="leg-repeat">$9,200</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#e8806f"></span><span class="leg-label">Happiness Guarantee failures</span><span class="leg-val val-red" id="leg-guarantee">$8,400</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#f4b5aa"></span><span class="leg-label">LTV at risk — churn exposure</span><span class="leg-val val-red" id="leg-ltv-cost">$16,200</span></div>
+<div class="leg-divider"></div>
+<div class="leg-item"><span class="leg-label" style="font-weight:600;color:var(--muted)">Annualised</span><span class="leg-val val-red" id="leg-annual-cost">$2.72M</span></div>
+</div>
+</div>
+</div>
+<div class="fin-card" onclick="openDrawer('revenue')">
+<div class="fin-card-top">
+<div class="fin-label">Revenue Opportunity This Week</div>
+<div class="fin-drill">View breakdown →</div>
+</div>
+<div class="fin-body">
+<div class="donut-wrap">
+<canvas height="120" id="rev-donut" width="120"></canvas>
+<div class="donut-centre">
+<div class="donut-total val-green" id="fin-rev-total">$61,800</div>
+<div class="donut-total-lbl">this week</div>
+</div>
+</div>
+<div class="fin-legend">
+<div class="leg-item"><span class="leg-dot" style="background:#1a7a4a"></span><span class="leg-label">Subscription retention saves</span><span class="leg-val val-green" id="leg-subs">$38,200</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#228b5a"></span><span class="leg-label">CS recovery — high-LTV unhappy</span><span class="leg-val val-green" id="leg-cross">$13,800</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#2fa870"></span><span class="leg-label">Quality complaint recovery</span><span class="leg-val val-green" id="leg-recovery">$5,700</span></div>
+<div class="leg-item"><span class="leg-dot" style="background:#5ac490"></span><span class="leg-label">Advocacy capture gap</span><span class="leg-val val-green" id="leg-advocacy">$4,100</span></div>
+<div class="leg-divider"></div>
+<div class="leg-item"><span class="leg-label" style="font-weight:600;color:var(--muted)">Annualised</span><span class="leg-val val-green" id="leg-annual-rev">$3.21M</span></div>
+</div>
+</div>
+</div>
+<div class="net-card">
+<div class="net-eyebrow">Total value surfaced this week</div>
+<div class="net-val" id="net-val">$114,200</div>
+<div class="net-sub">Cost exposure + Revenue opportunity</div>
+</div>
+</div>
+
+<!-- OPERATIONAL SIGNALS -->
+<div class="connector">Operational signals driving this week.</div>
+<div class="bi-row" style="grid-template-columns:1fr;margin-bottom:14px">
+
+<!-- WORKFORCE SIGNAL -->
+<div class="bi-card" onclick="openDrawer('capacity')">
+<div class="bi-top"><div class="bi-label">Workforce Signal &amp; Queue Status</div><div class="bi-drill">View ORM →</div></div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 12px;background:#fffbeb;border:0.5px solid #fde68a;border-radius:7px">
+<div style="font-size:22px;font-weight:800;color:var(--amber);letter-spacing:-0.5px">Early Warning</div>
+<div style="flex:1">
+<div style="font-size:11px;color:var(--amber);font-weight:600">Current queue status</div>
+<div style="font-size:11px;color:var(--muted)">Wait time: 1m 42s · approaching Warning threshold (2 min)</div>
+</div>
+</div>
+<div class="cap-row"><div class="cap-label">Contacts/agent/day</div><div class="cap-val val-amber">61 <span style="font-size:11px;color:var(--amber);font-weight:500">↑ vs 48 baseline</span></div></div>
+<div class="cap-row"><div class="cap-label">Active agents on voice</div><div class="cap-val">44 <span style="font-size:11px;color:var(--muted);font-weight:400">of 52 available</span></div></div>
+<div class="cap-row"><div class="cap-label">Quality gap — overloaded vs normal</div><div class="cap-val val-red">−11 pts</div></div>
+<div class="cap-row"><div class="cap-label">Consecutive weeks of overload</div><div class="cap-val val-amber">3 weeks</div></div>
+<div class="alert-box alert-amber" style="margin-top:10px;margin-bottom:0">
+⚠ Projected queue status: <strong>Warning</strong> within 90 minutes at the current trajectory. Actions 4–6 will trigger. Bombas notification (FYI) required. Click to see the full Operational Response Matrix.
+</div>
+</div>
+</div>
+
+<!-- PRODUCT INTELLIGENCE — full width below BI row -->
+<div class="bi-card" style="margin-bottom:28px" onclick="openDrawer('product')">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+<div class="bi-label">Product Intelligence — Top Contact Drivers This Week</div>
+<div class="bi-drill">Deep dive →</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+<div>
+<div class="bi-item">
+<div class="bi-rank">1</div>
+<div class="bi-name">Order not received / fulfilment delay</div>
+<div class="bi-bar-wrap"><div class="bi-bar" style="width:100%;background:#c0392b"></div></div>
+<div class="bi-count">624</div>
+<div class="bi-flag flag-red">↑ 4.1×</div>
+</div>
+<div class="bi-item">
+<div class="bi-rank">2</div>
+<div class="bi-name">CS unresolved — callback on same issue</div>
+<div class="bi-bar-wrap"><div class="bi-bar" style="width:48%;background:#d9534f"></div></div>
+<div class="bi-count">302</div>
+<div class="bi-flag flag-red">↑ Structural</div>
+</div>
+<div class="bi-item">
+<div class="bi-rank">3</div>
+<div class="bi-name">Quality / durability complaint</div>
+<div class="bi-bar-wrap"><div class="bi-bar" style="width:29%;background:#d97706"></div></div>
+<div class="bi-count">181</div>
+<div class="bi-flag flag-amber">↑ +34%</div>
+</div>
+<div class="bi-item">
+<div class="bi-rank">4</div>
+<div class="bi-name">Sizing / fit — return or exchange</div>
+<div class="bi-bar-wrap"><div class="bi-bar" style="width:20%;background:#1a7a4a"></div></div>
+<div class="bi-count">127</div>
+<div class="bi-flag flag-green">Stable</div>
+</div>
+<div class="bi-item">
+<div class="bi-rank">5</div>
+<div class="bi-name">Subscription cancel / pause request</div>
+<div class="bi-bar-wrap"><div class="bi-bar" style="width:20%;background:#1a7a4a"></div></div>
+<div class="bi-count">127</div>
+<div class="bi-flag flag-amber">↑ Signal</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div class="alert-box alert-red">
+⚠ <strong>Fulfilment failure contacts are 4.1× baseline.</strong> 624 contacts this week from customers whose orders were not received or not acknowledged. This is the primary cost driver this week. Root cause: fulfilment pipeline — not a contact centre issue and not coachable.
+</div>
+<div class="alert-box alert-amber">
+⚠ <strong>Quality complaint volume up 34% WoW.</strong> Customers are explicitly naming thinner material and faster wear-through than previous purchases. This language pattern is consistent with a material formulation change, not a batch defect. Recommend urgent product team review before this reaches Trustpilot at scale.
+</div>
+</div>
+</div>
+</div>
+
+<!-- DECISIONS / ACTIONS / WATCH -->
+<div class="connector">This week's action picture.</div>
+<div class="bottom-row" style="margin-bottom:28px">
+<div class="bottom-card" onclick="openDrawer('decisions')">
+<div class="bottom-top"><div class="bottom-label">Requires Your Decision</div><div class="fin-drill">3 items →</div></div>
+<div class="dec-row">
+<div class="dec-bar" style="background:var(--red)"></div>
+<div class="dec-body">
+<div class="dec-title">Fulfilment pipeline investigation — authorise urgent review, halt new orders until root cause confirmed</div>
+<div class="dec-type type-prod" style="display:inline-block">Operations</div>
+</div>
+<div class="dec-cost">$52k</div>
+</div>
+<div class="dec-row">
+<div class="dec-bar" style="background:var(--amber)"></div>
+<div class="dec-body">
+<div class="dec-title">CS escalation path — no human escalation exists. Customers hitting AI loop with no exit.</div>
+<div class="dec-type type-pol" style="display:inline-block">Policy</div>
+</div>
+<div class="dec-cost">$9.2k</div>
+</div>
+<div class="dec-row">
+<div class="dec-bar" style="background:var(--purple)"></div>
+<div class="dec-body">
+<div class="dec-title">Quality material review — 34% WoW increase, customers naming polyester shift</div>
+<div class="dec-type type-gov" style="display:inline-block">Product</div>
+</div>
+<div class="dec-cost">$8.4k</div>
+</div>
+</div>
+
+<div class="bottom-card" onclick="openDrawer('nba')">
+<div class="bottom-top"><div class="bottom-label">Action Effectiveness</div><div class="fin-drill">Full tracker →</div></div>
+<div class="nba-row">
+<div class="nba-state" style="background:var(--green)"></div>
+<div class="nba-title">Donation FAQ deployed — handle time −74% on 'where did my pair go?' calls</div>
+<div class="nba-impact"><div class="nba-impact-val val-green">$4,100</div><div class="nba-impact-lbl">saved/wk</div></div>
+</div>
+<div class="nba-row">
+<div class="nba-state" style="background:var(--green)"></div>
+<div class="nba-title">IVR queue message updated for Warning status</div>
+<div class="nba-impact"><div class="nba-impact-val val-green">−18%</div><div class="nba-impact-lbl">queue load</div></div>
+</div>
+<div class="nba-row">
+<div class="nba-state" style="background:var(--amber)"></div>
+<div class="nba-title">AI triage — routing critical complaints to human agent</div>
+<div class="nba-impact"><div class="nba-impact-val val-amber">In prog.</div><div class="nba-impact-lbl">FCR +12pp</div></div>
+</div>
+<div class="nba-row">
+<div class="nba-state" style="background:var(--red)"></div>
+<div class="nba-title">Fulfilment investigation — exec sign-off required</div>
+<div class="nba-impact"><div class="nba-impact-val val-red">$52k</div><div class="nba-impact-lbl">per week</div></div>
+</div>
+</div>
+
+<div class="bottom-card" onclick="openDrawer('watch')">
+<div class="bottom-top"><div class="bottom-label">What to Watch</div><div class="fin-drill">3 signals →</div></div>
+<div class="watch-row">
+<div class="watch-dot" style="background:var(--red)"></div>
+<div>
+<div class="watch-title">Trustpilot at 1.6 — fulfilment and CS themes dominating public reviews</div>
+<div class="watch-proj">→ Reputation damage compounding weekly. Same three themes in both internal contacts and public reviews.</div>
+</div>
+</div>
+<div class="watch-row">
+<div class="watch-dot" style="background:var(--amber)"></div>
+<div>
+<div class="watch-title">Quality language on Trustpilot matching internal — material change reaching public discourse</div>
+<div class="watch-proj">→ Customers naming polyester shift in both call contacts and public reviews. Product investigation urgent.</div>
+</div>
+</div>
+<div class="watch-row">
+<div class="watch-dot" style="background:var(--light)"></div>
+<div>
+<div class="watch-title">Queue approaching Warning threshold — 90 min projection</div>
+<div class="watch-proj">→ If volume holds, Bombas notification triggered. Approval required if it reaches Elevated.</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- VOC -->
+<div class="connector">Behind every number, real customers.</div>
+<div class="card" style="margin-bottom:28px">
+<div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:28px;align-items:start">
+<div>
+<div class="section-label" style="margin-bottom:14px">What customers are saying in contacts this week</div>
+<div class="drawer-verbatim" style="margin-bottom:8px">
+<div class="drawer-verbatim-quote">"I've been waiting three weeks and nobody has responded to my emails"</div>
+<div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">214 contacts</span><span class="tag tag-red">↑ +140 WoW</span><span class="tag tag-amber">Fulfilment</span></div>
+</div>
+<div class="drawer-verbatim" style="margin-bottom:8px">
+<div class="drawer-verbatim-quote">"I think the reply is AI — it didn't even read what I wrote"</div>
+<div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">178 contacts</span><span class="tag tag-red">CS breakdown</span></div>
+</div>
+<div class="drawer-verbatim" style="margin-bottom:8px">
+<div class="drawer-verbatim-quote">"These are noticeably thinner than the ones I bought two years ago"</div>
+<div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">91 contacts</span><span class="tag tag-amber">↑ +34% WoW</span><span class="tag tag-amber">Quality signal</span></div>
+</div>
+<div class="drawer-verbatim" style="margin-bottom:8px">
+<div class="drawer-verbatim-quote">"I just want to pause, not cancel — I didn't know that was an option"</div>
+<div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">43 contacts</span><span class="tag tag-green">Save signal</span></div>
+</div>
+</div>
+<div style="background:var(--border);align-self:stretch"></div>
+<div>
+<div class="voc-pulse-panel">
+<div class="voc-pulse-title">External Reputation Pulse</div>
+<div class="voc-pulse-grid">
+<div class="voc-score-block">
+<div class="voc-score-num val-red">31%</div>
+<div class="voc-score-lbl">Frustration rate</div>
+<div class="voc-score-chg chg-red">↑ +8pp WoW</div>
+</div>
+<div class="voc-score-block">
+<div class="voc-score-num val-red" style="font-size:28px">1.6</div>
+<div class="voc-score-lbl">Trustpilot</div>
+<div class="voc-score-chg chg-red">Rated "Bad" · 9,000+ reviews</div>
+</div>
+</div>
+<div class="voc-minichart"><canvas id="tp-trend"></canvas></div>
+<div style="font-size:10px;color:var(--light);text-align:right;margin-bottom:10px">Trustpilot score · 8-week trend ↓</div>
+</div>
+<div class="section-label" style="margin-bottom:10px">How this is showing up externally</div>
+<div class="alert-box alert-red" style="margin-bottom:10px">
+<strong>Trustpilot: 1.6 / 5 — rated "Bad"</strong> based on 9,000+ reviews. Dominant themes: delivery/fulfilment failures (41% of negative reviews), CS unresponsiveness (34%), quality decline (18%). This is not a recent anomaly — it reflects a sustained operational pattern now fully visible to potential customers.
+</div>
+<div class="alert-box alert-amber" style="margin-bottom:10px">
+<strong>Internal and external signals are fully aligned.</strong> The same three issues driving internal contacts — fulfilment failure, CS breakdown, quality decline — are the three dominant themes in public reviews. The contact centre data predicted this before it reached public discourse.
+</div>
+<div class="alert-box alert-green">
+<strong>Advocacy capture gap.</strong> 94 contacts this week ended with genuine customer satisfaction. Trustpilot received 6 positive reviews. A post-resolution review prompt for high-CSAT contacts would directly offset the negative review trajectory.
+</div>
+</div>
+</div>
+</div>
+
+</div><!-- /page -->
+</div><!-- /page-exec -->
+
+<!-- ═══════════════════ OPS MANAGER ═══════════════════ -->
+<div id="page-ops" class="page-view">
+<div class="page">
+
+  <div class="rp-header">
+    <div class="rp-title">Ops Manager Dashboard</div>
+    <div class="rp-subtitle">Bombas · Week 18 · 28 Apr – 4 May 2026 · 3,241 contacts analysed</div>
+  </div>
+
+  <div class="connector">This week's pulse.</div>
+  <div class="pulse">
+    <div class="pulse-left">
+      <div class="pulse-date">28 Apr – 4 May 2026 · Week 18 · 3,241 contacts</div>
+      <div class="pulse-headline">Sizing-driven returns are dominating contact volume for the third consecutive week. The Marled Calf Sock SKU is confirmed as the root cause. 127 subscription cancel calls this week have an estimated 68% save rate — no retention script is currently in place.</div>
+      <div class="pulse-chips">
+        <div class="pulse-chip"><span class="pulse-dot" style="background:#fca5a5"></span>Return rate 18% — 3.2× baseline</div>
+        <div class="pulse-chip"><span class="pulse-dot" style="background:#fca5a5"></span>FCR 61% — below 72% sector median</div>
+        <div class="pulse-chip"><span class="pulse-dot" style="background:#fbbf24"></span>127 subscription cancel calls — saveable</div>
+        <div class="pulse-chip"><span class="pulse-dot" style="background:#4ade80"></span>Donation FAQ deployed — AHT down 74%</div>
+      </div>
+    </div>
+    <div class="pulse-right">
+      <div class="pulse-kpi-grid">
+        <div class="pulse-kpi"><div class="pulse-kpi-lbl">Return Rate</div><div class="pulse-kpi-val" style="color:#fca5a5">18%</div><div class="pulse-kpi-chg" style="color:#fca5a5">↑ +3.2× baseline</div></div>
+        <div class="pulse-kpi"><div class="pulse-kpi-lbl">FCR</div><div class="pulse-kpi-val" style="color:#fbbf24">61%</div><div class="pulse-kpi-chg" style="color:#fbbf24">↓ −7pp WoW</div></div>
+        <div class="pulse-kpi"><div class="pulse-kpi-lbl">CSAT</div><div class="pulse-kpi-val" style="color:#fca5a5">3.6</div><div class="pulse-kpi-chg" style="color:#fca5a5">↓ −0.5 WoW</div></div>
+        <div class="pulse-kpi"><div class="pulse-kpi-lbl">RCR</div><div class="pulse-kpi-val" style="color:#fca5a5">28%</div><div class="pulse-kpi-chg" style="color:#fca5a5">↑ +5pp WoW</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">KPI performance against targets.</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-tile active"><div class="kpi-tile-lbl">Return Rate</div><div class="kpi-tile-val val-red">18%</div><div class="kpi-tile-chg chg-red">↑ +3.2× baseline</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">FCR</div><div class="kpi-tile-val val-amber">61%</div><div class="kpi-tile-chg chg-red">↓ −7pp vs 72% target</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">CSAT</div><div class="kpi-tile-val val-red">3.6</div><div class="kpi-tile-chg chg-red">↓ −0.5 WoW</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">NPS</div><div class="kpi-tile-val val-amber">38</div><div class="kpi-tile-chg chg-red">↓ −4 WoW</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">Esc Rate</div><div class="kpi-tile-val val-red">14%</div><div class="kpi-tile-chg chg-red">↑ +3pp WoW</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">Transfer</div><div class="kpi-tile-val val-amber">9%</div><div class="kpi-tile-chg chg-red">↑ +2pp WoW</div></div>
+    <div class="kpi-tile"><div class="kpi-tile-lbl">RCR</div><div class="kpi-tile-val val-red">28%</div><div class="kpi-tile-chg chg-red">↑ +5pp WoW</div></div>
+  </div>
+
+  <div class="period-tabs">
+    <button class="period-tab active" onclick="switchPeriod(this,'ops-wbr')">Weekly (WBR)</button>
+    <button class="period-tab" onclick="switchPeriod(this,'ops-mbr')">Monthly (MBR)</button>
+    <button class="period-tab" onclick="switchPeriod(this,'ops-qbr')">Quarterly (QBR)</button>
+    <button class="period-tab" onclick="switchPeriod(this,'ops-ybr')">Yearly (YBR)</button>
+  </div>
+
+  <div id="ops-wbr">
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title">Return &amp; Exchange Contacts — 8-week trend</div><div class="chart-period">Wk 11 – Wk 18</div></div>
+      <div class="chart-h-md"><canvas id="ops-chart-returns"></canvas></div>
+    </div>
+    <div class="connector">Top issues this week.</div>
+    <div class="issue-row">
+      <div class="issue-sev" style="background:var(--red)"></div>
+      <div class="issue-body">
+        <div class="issue-title">Marled Calf Sock sizing crisis — return contacts at 3.2× baseline for 3rd consecutive week</div>
+        <div class="issue-meta"><span class="tag tag-red">Critical</span><span class="tag tag-amber">SKU: Marled Calf Navy + Slate</span><span class="tag tag-muted">Return Rate</span><span class="tag tag-muted">FCR</span></div>
+      </div>
+      <div class="issue-right"><div class="issue-vol val-red">584</div><div class="issue-vol-lbl">contacts</div></div>
+    </div>
+    <div class="issue-row">
+      <div class="issue-sev" style="background:var(--red)"></div>
+      <div class="issue-body">
+        <div class="issue-title">Subscription cancel calls with no retention path — 68% of callers have a fixable issue, zero save script exists</div>
+        <div class="issue-meta"><span class="tag tag-red">Critical</span><span class="tag tag-amber">Policy gap</span><span class="tag tag-muted">Subscription</span></div>
+      </div>
+      <div class="issue-right"><div class="issue-vol val-red">127</div><div class="issue-vol-lbl">contacts</div></div>
+    </div>
+    <div class="issue-row">
+      <div class="issue-sev" style="background:var(--amber)"></div>
+      <div class="issue-body">
+        <div class="issue-title">Repeat exchange contacts — customers calling back on same return not resolved first time</div>
+        <div class="issue-meta"><span class="tag tag-amber">Medium</span><span class="tag tag-muted">RCR</span><span class="tag tag-muted">FCR</span></div>
+      </div>
+      <div class="issue-right"><div class="issue-vol val-amber">214</div><div class="issue-vol-lbl">contacts</div></div>
+    </div>
+    <div class="issue-row">
+      <div class="issue-sev" style="background:var(--amber)"></div>
+      <div class="issue-body">
+        <div class="issue-title">Gift order disputes — 100% escalation rate, no resolution authority defined for agents</div>
+        <div class="issue-meta"><span class="tag tag-amber">Medium</span><span class="tag tag-purple">Governance gap</span><span class="tag tag-muted">ESC</span></div>
+      </div>
+      <div class="issue-right"><div class="issue-vol val-amber">71</div><div class="issue-vol-lbl">contacts</div></div>
+    </div>
+
+    <div class="connector" style="margin-top:20px">Next best actions — 23 ready to execute.</div>
+    <div class="nba-row">
+      <div class="nba-num">1</div>
+      <div class="nba-body">
+        <div class="nba-title">Escalate Marled Calf Sock sizing to product team — halt dispatch on affected SKUs pending investigation</div>
+        <div class="nba-detail">584 contacts this week · High effort · Product Team + Exec sign-off required</div>
+        <div class="nba-tags"><span class="tag tag-red">Executive decision needed</span><span class="tag tag-muted">Return Rate</span></div>
+      </div>
+      <div class="nba-impact"><div class="nba-impact-val val-red">$42k</div><div class="nba-impact-lbl">weekly cost</div></div>
+    </div>
+    <div class="nba-row">
+      <div class="nba-num">2</div>
+      <div class="nba-body">
+        <div class="nba-title">Deploy subscription save script — pause offer + 10% loyalty discount, requires policy approval</div>
+        <div class="nba-detail">127 cancel callers · 68% saveable · Medium effort · Policy sign-off required</div>
+        <div class="nba-tags"><span class="tag tag-amber">Policy approval needed</span><span class="tag tag-muted">Subscription</span></div>
+      </div>
+      <div class="nba-impact"><div class="nba-impact-val val-green">$38k</div><div class="nba-impact-lbl">opp/week</div></div>
+    </div>
+    <div class="nba-row">
+      <div class="nba-num">3</div>
+      <div class="nba-body">
+        <div class="nba-title">Create gift order resolution guide — define agent authority limits for replacement, refund, address change</div>
+        <div class="nba-detail">71 escalations/week avoidable · Low effort · CX Lead</div>
+        <div class="nba-tags"><span class="tag tag-green">Open</span><span class="tag tag-muted">ESC Rate</span></div>
+      </div>
+      <div class="nba-impact"><div class="nba-impact-val val-amber">−100%</div><div class="nba-impact-lbl">esc rate</div></div>
+    </div>
+  </div>
+
+  <div id="ops-mbr" style="display:none">
+    <div class="card" style="border-left:3px solid var(--dark2);padding:18px 20px;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:500;color:var(--dark);line-height:1.55">April 2026: Sizing-driven return volume grew throughout the month, peaking in Week 18. The subscription cancel problem is a separate structural issue that has been present for the full month. Combined cost: estimated $168,000 over 4 weeks.</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header"><div class="chart-title">Return Contacts — April 2026 (Weekly)</div><div class="chart-period">4 weeks</div></div>
+      <div class="chart-h-md"><canvas id="ops-mbr-chart"></canvas></div>
+    </div>
+  </div>
+
+  <div id="ops-qbr" style="display:none">
+    <div class="card" style="border-left:3px solid var(--dark2);padding:18px 20px;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:500;color:var(--dark);line-height:1.55">Q1 2026: Return and exchange contacts were stable until Week 15 when the Marled Calf sizing issue emerged. Subscription cancels have been above baseline throughout the quarter. Two validated best practices identified in Q1 are deployable immediately.</div>
+    </div>
+    <div class="rp-grid-2">
+      <div class="card"><div class="section-label">Best Practice · Validated Q1</div><div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:6px">Donation FAQ deployment reduced handle time on "where did my pair go?" calls from 8.2 min to 2.1 min</div><div style="display:flex;gap:6px"><span class="tag tag-green">AHT −74%</span><span class="tag tag-green">CSAT 4.8/5</span></div></div>
+      <div class="card"><div class="section-label">Best Practice · Validated Q1</div><div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:6px">Cross-category agent scripts reduced escalations on underwear/t-shirt queries from 84% to 12%</div><div style="display:flex;gap:6px"><span class="tag tag-green">ESC −72pp</span><span class="tag tag-green">FCR +18pp</span></div></div>
+    </div>
+  </div>
+
+  <div id="ops-ybr" style="display:none">
+    <div class="card" style="border-left:3px solid var(--dark2);padding:18px 20px;margin-bottom:14px">
+      <div style="font-size:14px;font-weight:500;color:var(--dark);line-height:1.55">2025–26: Subscription retention has been a structural gap for 12+ months. Seasonal return spikes (holiday, Q1) are addressable with product sizing governance. The "Bee Better" donation programme is a brand asset not yet reflected in contact centre capability.</div>
+    </div>
+    <div class="rp-grid-3">
+      <div class="rp-stat-card"><div class="rp-stat-lbl">Structural gap</div><div class="rp-stat-val val-red">12+ mo</div><div class="rp-stat-sub">No subscription save script</div></div>
+      <div class="rp-stat-card"><div class="rp-stat-lbl">Avg seasonal return spike</div><div class="rp-stat-val val-amber">+2.4×</div><div class="rp-stat-sub">Holiday + Q1 periods</div></div>
+      <div class="rp-stat-card"><div class="rp-stat-lbl">QiQ actions implemented</div><div class="rp-stat-val val-green">31</div><div class="rp-stat-sub">$486,000 measured saving</div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════ QA ANALYST ═══════════════════ -->
+<div id="page-qa" class="page-view">
+<div class="page">
+
+  <div class="rp-header">
+    <div class="rp-title">Quality Analyst Dashboard</div>
+    <div class="rp-subtitle">Bombas · Week 18 · 28 Apr – 4 May 2026 · 3,241 contacts analysed</div>
+  </div>
+
+  <div class="connector">Critical failure breakdown this week.</div>
+  <div class="qa-matrix">
+    <div class="qa-matrix-cell">
+      <div class="qa-matrix-icon">🔴</div>
+      <div class="qa-matrix-num val-red">94</div>
+      <div class="qa-matrix-lbl">Total CFs</div>
+      <div class="qa-matrix-sub">↑ +12 vs prev week</div>
+    </div>
+    <div class="qa-matrix-cell">
+      <div class="qa-matrix-icon">⚙️</div>
+      <div class="qa-matrix-num" style="color:var(--blue)">57</div>
+      <div class="qa-matrix-lbl">System / Policy</div>
+      <div class="qa-matrix-sub">61% — outside agent control</div>
+    </div>
+    <div class="qa-matrix-cell">
+      <div class="qa-matrix-icon">👤</div>
+      <div class="qa-matrix-num val-amber">37</div>
+      <div class="qa-matrix-lbl">Agent Behaviour</div>
+      <div class="qa-matrix-sub">39% — coachable</div>
+    </div>
+    <div class="qa-matrix-cell">
+      <div class="qa-matrix-icon">✅</div>
+      <div class="qa-matrix-num val-green">28</div>
+      <div class="qa-matrix-lbl">Reviewed</div>
+      <div class="qa-matrix-sub">66 pending review</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;padding:12px 16px;background:#eff6ff;border-color:#bfdbfe">
+    <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:3px">Insight: 61% of critical failures are outside agent control</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.5">Coaching these agents would be ineffective and potentially demoralising. Primary intervention should target the Marled Calf SKU product fix and the subscription policy gap — not agent performance plans.</div>
+  </div>
+
+  <div class="rp-grid-2">
+    <div>
+      <div class="connector">Call review queue — 66 pending.</div>
+      <div class="call-row">
+        <div class="call-score score-red" style="font-size:15px;font-weight:700">32</div>
+        <div class="call-body">
+          <div class="call-id">Call #B-2241 · Sarah W. · 28 Apr · 34m 12s</div>
+          <div class="call-text">Agent unable to process exchange due to missing return label process — customer called back same day. Sizing complaint for Marled Calf Navy. Agent not at fault — system gap.</div>
+          <div class="call-tags"><span class="tag tag-blue">System issue</span><span class="tag tag-muted">Return</span><span class="tag tag-muted">FCR</span></div>
+        </div>
+      </div>
+      <div class="call-row">
+        <div class="call-score score-red" style="font-size:15px;font-weight:700">41</div>
+        <div class="call-body">
+          <div class="call-id">Call #B-1887 · Marcus L. · 27 Apr · 22m 8s</div>
+          <div class="call-text">Agent escalated subscription cancel call without attempting retention. No pause option offered. Entirely avoidable churn — policy gap.</div>
+          <div class="call-tags"><span class="tag tag-amber">Policy gap</span><span class="tag tag-muted">Subscription</span><span class="tag tag-muted">ESC</span></div>
+        </div>
+      </div>
+      <div class="call-row">
+        <div class="call-score score-amber" style="font-size:15px;font-weight:700">58</div>
+        <div class="call-body">
+          <div class="call-id">Call #B-3104 · Priya K. · 29 Apr · 18m 30s</div>
+          <div class="call-text">Cross-category enquiry (underwear sizing) escalated — agent had no KB article to reference. Same issue type as previous 3 calls this week.</div>
+          <div class="call-tags"><span class="tag tag-amber">Knowledge gap</span><span class="tag tag-muted">ESC</span><span class="tag tag-muted">CSAT</span></div>
+        </div>
+      </div>
+      <div class="call-row">
+        <div class="call-score score-green" style="font-size:15px;font-weight:700">91</div>
+        <div class="call-body">
+          <div class="call-id">Call #B-3821 · Jamie T. · 30 Apr · 7m 14s</div>
+          <div class="call-text">Donation FAQ handled cleanly — customer delighted with specific response. Proactively offered cross-category recommendation. Best practice flagged.</div>
+          <div class="call-tags"><span class="tag tag-green">Best Practice</span><span class="tag tag-muted">FCR ✓</span><span class="tag tag-muted">CSAT 5/5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="connector">Insight approval queue.</div>
+      <div class="card" style="border-left:3px solid var(--amber);margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+          <div style="font-size:13px;font-weight:500;color:var(--dark)">Marled Calf Sock return rate anomaly — 3.2× baseline. Likely sizing guide inaccuracy or batch defect.</div>
+          <span class="tag tag-amber" style="flex-shrink:0;margin-left:10px">Pending</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Evidence base: 584 contacts, 3 consecutive weeks, same SKU and same complaint. High confidence.</div>
+        <div style="display:flex;gap:7px">
+          <button class="btn-export" style="background:var(--dark);color:#fff;border-color:var(--dark)">Approve →</button>
+          <button class="btn-export">Return for review</button>
+        </div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--green);margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+          <div style="font-size:13px;font-weight:500;color:var(--dark)">Jamie T. donation FAQ approach validated as best practice — CSAT 4.9 avg on these calls vs 3.6 team average.</div>
+          <span class="tag tag-green" style="flex-shrink:0;margin-left:10px">Best Practice</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Evidence base: 14 calls across 3 agents. Recommend scaling to all agents as standard KB.</div>
+        <div style="display:flex;gap:7px">
+          <button class="btn-export" style="background:var(--green);color:#fff;border-color:var(--green)">Approve &amp; Scale →</button>
+          <button class="btn-export">View calls</button>
+        </div>
+      </div>
+      <div class="card" style="border-left:3px solid var(--blue)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px">
+          <div style="font-size:13px;font-weight:500;color:var(--dark)">Gift order disputes — 100% escalation rate driven by absence of agent resolution authority, not agent skill.</div>
+          <span class="tag tag-blue" style="flex-shrink:0;margin-left:10px">Structural</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:10px">71 contacts this week. No agent has been coached on this — they literally have no framework to follow.</div>
+        <div style="display:flex;gap:7px">
+          <button class="btn-export" style="background:var(--dark);color:#fff;border-color:var(--dark)">Approve →</button>
+          <button class="btn-export">View evidence</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════ TEAM LEAD ═══════════════════ -->
+<div id="page-teamlead" class="page-view">
+<div class="page">
+
+  <div class="rp-header">
+    <div class="rp-title">Technical Support Team</div>
+    <div class="rp-subtitle">8 agents · Week 18 · 28 Apr – 4 May 2026 · 312 contacts handled</div>
+  </div>
+
+  <div class="rp-grid-4">
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Team Health</div><div class="rp-stat-val val-amber">71</div><div class="rp-stat-sub">↓ −4 vs prev week</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Contacts Handled</div><div class="rp-stat-val">312</div><div class="rp-stat-sub">avg 39 per agent</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Agents Flagged</div><div class="rp-stat-val val-red">2</div><div class="rp-stat-sub">Coaching needed</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Coaching Actions</div><div class="rp-stat-val val-green">6</div><div class="rp-stat-sub">AI-generated this week</div></div>
+  </div>
+
+  <div class="connector">Team performance matrix.</div>
+  <div class="card" style="padding:0;margin-bottom:14px;overflow:hidden">
+    <table class="agent-table">
+      <thead>
+        <tr>
+          <th>Agent</th><th>Contacts</th><th>Return Rate</th><th>FCR</th><th>CSAT</th><th>Esc Rate</th><th>RCR</th><th>QiQ Score</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#d97706">JT</div>🏆 Jamie T.</div></td>
+          <td>42</td><td style="color:var(--green);font-weight:600">6%</td><td style="color:var(--green);font-weight:600">81%</td><td style="color:var(--green);font-weight:600">4.7</td><td style="color:var(--green);font-weight:600">4%</td><td style="color:var(--green);font-weight:600">11%</td>
+          <td style="font-weight:700">93</td><td><span class="tag tag-green">On Track</span></td>
+        </tr>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#1a1a2e">SK</div>Sophie K.</div></td>
+          <td>38</td><td>9%</td><td>74%</td><td>4.0</td><td>7%</td><td>18%</td>
+          <td style="font-weight:700">84</td><td><span class="tag tag-green">On Track</span></td>
+        </tr>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#1a1a2e">PK</div>Priya K.</div></td>
+          <td>40</td><td style="color:var(--amber)">14%</td><td style="color:var(--amber)">62%</td><td>3.8</td><td style="color:var(--amber)">12%</td><td>22%</td>
+          <td style="font-weight:700;color:var(--amber)">69</td><td><span class="tag tag-amber">Watch</span></td>
+        </tr>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#1a1a2e">OF</div>Omar F.</div></td>
+          <td>41</td><td>11%</td><td>68%</td><td>4.0</td><td style="color:var(--amber)">10%</td><td>19%</td>
+          <td style="font-weight:700">73</td><td><span class="tag tag-amber">Watch</span></td>
+        </tr>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#1a1a2e">LB</div>Lucy B.</div></td>
+          <td>37</td><td>8%</td><td>72%</td><td>4.2</td><td>8%</td><td>16%</td>
+          <td style="font-weight:700">82</td><td><span class="tag tag-green">On Track</span></td>
+        </tr>
+        <tr style="background:#fef9f9">
+          <td><div class="agent-name"><div class="agent-avatar" style="background:var(--red)">ML</div>⚠ Marcus L.</div></td>
+          <td>35</td><td style="color:var(--red);font-weight:600">22%</td><td style="color:var(--red);font-weight:600">51%</td><td style="color:var(--red);font-weight:600">3.1</td><td style="color:var(--red);font-weight:600">19%</td><td style="color:var(--red);font-weight:600">31%</td>
+          <td style="font-weight:700;color:var(--red)">48</td><td><span class="tag tag-red">Action Needed</span></td>
+        </tr>
+        <tr style="background:#fef9f9">
+          <td><div class="agent-name"><div class="agent-avatar" style="background:var(--red)">AB</div>⚠ Aisha B.</div></td>
+          <td>36</td><td style="color:var(--red)">20%</td><td style="color:var(--red)">55%</td><td style="color:var(--red)">3.2</td><td style="color:var(--red);font-weight:600">17%</td><td style="color:var(--red)">28%</td>
+          <td style="font-weight:700;color:var(--red)">52</td><td><span class="tag tag-red">Action Needed</span></td>
+        </tr>
+        <tr>
+          <td><div class="agent-name"><div class="agent-avatar" style="background:#1a1a2e">RS</div>Ravi S.</div></td>
+          <td>43</td><td>13%</td><td>64%</td><td>4.1</td><td>9%</td><td>20%</td>
+          <td style="font-weight:700">71</td><td><span class="tag tag-amber">Watch</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="connector">AI-generated coaching briefs.</div>
+  <div class="rp-grid-2">
+    <div class="card" style="border-left:3px solid var(--red)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div class="agent-avatar" style="background:var(--red);width:32px;height:32px;font-size:11px">ML</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--dark)">Marcus L.</div><div style="font-size:11px;color:var(--muted)">Return Rate 22% · CSAT 3.1 · 6 flags this week</div></div>
+        <span class="tag tag-red" style="margin-left:auto">Action Needed</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px">A consistent pattern is visible: Marcus is not offering the sizing exchange pathway on Marled Calf return calls — instead defaulting to escalation. 4 of 6 flagged calls this week were Marled Calf returns that could have been resolved at first contact. Note: 2 of 6 flags are product-driven (sizing defect) and are not coachable. Focus coaching on the exchange process, not the product issue.</div>
+      <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Specific calls to review</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-muted">#B-2241 · 34m · CSAT 1</span><span class="tag tag-muted">#B-2198 · 28m · Escalated</span><span class="tag tag-muted">#B-2176 · 26m · Repeat</span></div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn-export">📋 View coaching brief</button>
+        <button class="btn-export">📞 Schedule 1-to-1</button>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--red)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div class="agent-avatar" style="background:var(--red);width:32px;height:32px;font-size:11px">AB</div>
+        <div><div style="font-size:13px;font-weight:600;color:var(--dark)">Aisha B.</div><div style="font-size:11px;color:var(--muted)">Esc Rate 17% · RCR 28% · 4 flags this week</div></div>
+        <span class="tag tag-red" style="margin-left:auto">Action Needed</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px">Aisha is escalating subscription cancel calls without attempting a retention conversation. In 3 of 4 flagged calls, the customer explicitly mentioned wanting to pause — not cancel. A pause offer was never mentioned. The subscription save policy decision is blocking this, but Aisha should be briefed on the pending policy change so she is ready to act when it is approved.</div>
+      <div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px">Specific calls to review</div><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag tag-muted">#B-1887 · Sub cancel</span><span class="tag tag-muted">#B-1901 · Sub cancel</span></div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn-export">📋 View coaching brief</button>
+        <button class="btn-export">📞 Schedule 1-to-1</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">Best practices validated this week.</div>
+  <div class="card" style="background:#f0fdf4;border-color:#bbf7d0;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">🏆 Best practice validated — recommend sharing with full team</div>
+    <div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:4px">Jamie T.'s donation FAQ approach — specific, personalised response reduces AHT by 74% and drives CSAT to 4.9</div>
+    <div style="font-size:12px;color:var(--muted)">Validated across 14 calls this week. Script: acknowledge the donation, name the partner organisation, confirm timing, offer to follow up. Takes 45 seconds. Previous handling: vague, unable to confirm, customer left uncertain.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════ AGENT ═══════════════════ -->
+<div id="page-agent" class="page-view">
+<div class="page">
+
+  <div class="agent-hero">
+    <div class="agent-hero-avatar">JT</div>
+    <div class="agent-hero-info">
+      <div class="agent-hero-name">Jamie Turner</div>
+      <div class="agent-hero-role">Customer Experience · Joined Feb 2024 · 42 contacts this week</div>
+      <div class="agent-hero-stats">
+        <div><div class="agent-hero-stat-val">93</div><div class="agent-hero-stat-lbl">QiQ Score</div></div>
+        <div><div class="agent-hero-stat-val">7m 14s</div><div class="agent-hero-stat-lbl">Avg AHT</div></div>
+        <div><div class="agent-hero-stat-val">81%</div><div class="agent-hero-stat-lbl">FCR</div></div>
+        <div><div class="agent-hero-stat-val">4.7</div><div class="agent-hero-stat-lbl">CSAT</div></div>
+      </div>
+    </div>
+    <div class="agent-hero-rank">
+      <div class="agent-rank-num">#1</div>
+      <div class="agent-rank-lbl">of 44 agents</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px">🏆 Top Performer</div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--dark);border:none;padding:16px 20px;margin-bottom:14px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">Your focus this week</div>
+    <div style="font-size:14px;font-weight:500;color:#fff;line-height:1.5;margin-bottom:10px">Your donation FAQ approach has been validated as a best practice and flagged to your Team Lead. This week: share your method with 2 peers — Priya K. and Marcus L. have been identified as the best candidates. Potential team impact: CSAT +1.1 avg on donation calls.</div>
+    <div style="display:flex;gap:8px"><span class="tag tag-green">Best Practice Recognised</span><span style="font-size:12px;color:rgba(255,255,255,0.35)">Team impact: CSAT +1.1</span></div>
+  </div>
+
+  <div class="connector">My performance vs team this week.</div>
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-tile" style="cursor:default"><div class="kpi-tile-lbl">Return Rate</div><div class="kpi-tile-val val-green">6%</div><div class="kpi-tile-chg chg-green">↓ Better · Team: 13%</div></div>
+    <div class="kpi-tile" style="cursor:default"><div class="kpi-tile-lbl">FCR</div><div class="kpi-tile-val val-green">81%</div><div class="kpi-tile-chg chg-green">↑ Better · Team: 64%</div></div>
+    <div class="kpi-tile" style="cursor:default"><div class="kpi-tile-lbl">CSAT</div><div class="kpi-tile-val val-green">4.7</div><div class="kpi-tile-chg chg-green">↑ Better · Team: 3.8</div></div>
+    <div class="kpi-tile" style="cursor:default"><div class="kpi-tile-lbl">Esc Rate</div><div class="kpi-tile-val val-green">4%</div><div class="kpi-tile-chg chg-green">↓ Better · Team: 11%</div></div>
+    <div class="kpi-tile" style="cursor:default"><div class="kpi-tile-lbl">RCR</div><div class="kpi-tile-val val-green">11%</div><div class="kpi-tile-chg chg-green">↓ Better · Team: 22%</div></div>
+  </div>
+
+  <div class="connector">My recent call feedback.</div>
+  <div class="call-row">
+    <div class="call-score score-green"><span style="font-size:16px;font-weight:700">94</span></div>
+    <div class="call-body">
+      <div class="call-id">Call #B-3821 · 30 Apr · 7m 14s</div>
+      <div class="call-text">Outstanding donation FAQ handling — customer was delighted with the specific response about donation timing and partner organisation. Proactive cross-category recommendation led to an underwear enquiry. Both elements are textbook examples of the team's new approach.</div>
+      <div class="call-tags"><span class="tag tag-green">FCR ✓</span><span class="tag tag-green">CSAT 5/5</span><span class="tag tag-green">Best Practice Flagged</span></div>
+    </div>
+  </div>
+  <div class="call-row">
+    <div class="call-score score-amber"><span style="font-size:16px;font-weight:700">78</span></div>
+    <div class="call-body">
+      <div class="call-id">Call #B-3809 · 29 Apr · 11m 32s</div>
+      <div class="call-text">Good empathy and resolution on sizing exchange but call ran long due to manual label generation process. The system adds ~4 minutes to every exchange call — this is a tool issue, not a performance issue.</div>
+      <div class="call-tags"><span class="tag tag-amber">AHT ↑</span><span class="tag tag-blue">System issue noted</span></div>
+    </div>
+  </div>
+  <div class="call-row">
+    <div class="call-score score-green"><span style="font-size:16px;font-weight:700">91</span></div>
+    <div class="call-body">
+      <div class="call-id">Call #B-3795 · 28 Apr · 5m 48s</div>
+      <div class="call-text">Clean resolution on underwear sizing query using the cross-category KB. Accurate product knowledge saved significant handle time — 8 minutes faster than the team average for this contact type.</div>
+      <div class="call-tags"><span class="tag tag-green">AHT ✓</span><span class="tag tag-green">FCR ✓</span><span class="tag tag-green">Cross-category KB used</span></div>
+    </div>
+  </div>
+
+  <div class="connector">My next best actions.</div>
+  <div class="nba-row">
+    <div class="nba-num">1</div>
+    <div class="nba-body">
+      <div class="nba-title">Share your donation FAQ method with Priya K. and Marcus L. this week — Team Lead has been notified</div>
+      <div class="nba-detail">A one-page summary of your approach has been drafted. Expected team impact: CSAT +1.1 on donation calls.</div>
+      <div class="nba-tags"><span class="tag tag-green">Team Impact</span></div>
+    </div>
+    <div class="nba-impact"><div class="nba-impact-val val-green">+1.1</div><div class="nba-impact-lbl">CSAT team</div></div>
+  </div>
+  <div class="nba-row">
+    <div class="nba-num">2</div>
+    <div class="nba-body">
+      <div class="nba-title">Add a specific ask for a review at close on high-CSAT contacts — currently missing from your close script</div>
+      <div class="nba-detail">Your 4.7 CSAT means your customers are the most likely to leave positive Trustpilot reviews. One sentence at close could generate 3–4 reviews/week from your contacts alone.</div>
+      <div class="nba-tags"><span class="tag tag-muted">NPS</span><span class="tag tag-muted">Advocacy</span></div>
+    </div>
+    <div class="nba-impact"><div class="nba-impact-val val-green">+Reviews</div><div class="nba-impact-lbl">Trustpilot</div></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════ ACCOUNT MANAGER ═══════════════════ -->
+<div id="page-am" class="page-view">
+<div class="page">
+
+  <div class="rp-header">
+    <div class="rp-title">Account Manager View</div>
+    <div class="rp-subtitle">Client portfolio overview · Week 18 · 28 Apr – 4 May 2026</div>
+  </div>
+
+  <div class="connector">Client health overview.</div>
+  <div class="rp-grid-3">
+    <div class="am-client-card" style="border-top:3px solid var(--red)">
+      <div class="am-client-top">
+        <div><div class="am-client-name">Bombas</div><div class="am-client-sector">DTC Apparel · Socks &amp; Accessories</div></div>
+        <div style="text-align:right"><div class="am-client-score val-red">54</div><div class="am-client-score-lbl">Health Score</div></div>
+      </div>
+      <div class="am-client-metrics">
+        <div><div class="am-client-metric-val val-red">18%</div><div class="am-client-metric-lbl">Return Rate</div></div>
+        <div><div class="am-client-metric-val val-amber">61%</div><div class="am-client-metric-lbl">FCR</div></div>
+        <div><div class="am-client-metric-val val-red">3.6</div><div class="am-client-metric-lbl">CSAT</div></div>
+      </div>
+      <div style="margin-top:10px"><span class="tag tag-red">⚠ At Risk — SKU crisis active</span></div>
+    </div>
+    <div class="am-client-card" style="border-top:3px solid var(--green)">
+      <div class="am-client-top">
+        <div><div class="am-client-name">Client B</div><div class="am-client-sector">Consumer Electronics</div></div>
+        <div style="text-align:right"><div class="am-client-score val-green">81</div><div class="am-client-score-lbl">Health Score</div></div>
+      </div>
+      <div class="am-client-metrics">
+        <div><div class="am-client-metric-val val-green">34%</div><div class="am-client-metric-lbl">FCR</div></div>
+        <div><div class="am-client-metric-val val-green">4.2</div><div class="am-client-metric-lbl">CSAT</div></div>
+        <div><div class="am-client-metric-val val-green">6%</div><div class="am-client-metric-lbl">Esc Rate</div></div>
+      </div>
+      <div style="margin-top:10px"><span class="tag tag-green">✓ Healthy — 3rd consecutive week</span></div>
+    </div>
+    <div class="am-client-card" style="border-top:3px solid var(--amber)">
+      <div class="am-client-top">
+        <div><div class="am-client-name">Client C</div><div class="am-client-sector">Financial Services</div></div>
+        <div style="text-align:right"><div class="am-client-score val-amber">67</div><div class="am-client-score-lbl">Health Score</div></div>
+      </div>
+      <div class="am-client-metrics">
+        <div><div class="am-client-metric-val val-amber">28%</div><div class="am-client-metric-lbl">FCR</div></div>
+        <div><div class="am-client-metric-val val-amber">3.9</div><div class="am-client-metric-lbl">CSAT</div></div>
+        <div><div class="am-client-metric-val val-amber">9%</div><div class="am-client-metric-lbl">Esc Rate</div></div>
+      </div>
+      <div style="margin-top:10px"><span class="tag tag-amber">⚡ Watch — FCR declining</span></div>
+    </div>
+  </div>
+
+  <div class="connector">Bombas — ROI and value delivered this week.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="rp-stat-card"><div class="rp-stat-lbl">QiQ value surfaced</div><div class="rp-stat-val" style="font-size:24px">$101k</div><div class="rp-stat-sub">Cost + opportunity · this week</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Since deployment</div><div class="rp-stat-val val-green" style="font-size:24px">$486k</div><div class="rp-stat-sub">Measured saving · 31 actions</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Pending blocked</div><div class="rp-stat-val val-red" style="font-size:24px">$72k</div><div class="rp-stat-sub">Accumulated unactioned cost</div></div>
+    <div class="rp-stat-card"><div class="rp-stat-lbl">Expansion pipeline</div><div class="rp-stat-val val-green" style="font-size:24px">$58k</div><div class="rp-stat-sub">Revenue opportunity · this week</div></div>
+  </div>
+
+  <div class="connector">Actions requiring client escalation this week.</div>
+  <div class="nba-row">
+    <div class="nba-num">1</div>
+    <div class="nba-body">
+      <div class="nba-title">Marled Calf SKU — executive escalation required. Product team review and dispatch hold needs sign-off.</div>
+      <div class="nba-detail">Blocked for 3 weeks. Accumulated cost $72k. Proposed action shared with client in Week 15.</div>
+      <div class="nba-tags"><span class="tag tag-red">Client decision overdue</span><span class="tag tag-muted">Product</span></div>
+    </div>
+    <div class="nba-impact"><div class="nba-impact-val val-red">$42k</div><div class="nba-impact-lbl">per week</div></div>
+  </div>
+  <div class="nba-row">
+    <div class="nba-num">2</div>
+    <div class="nba-body">
+      <div class="nba-title">Subscription save policy — pause offer and 10% loyalty script awaiting executive approval since Week 15.</div>
+      <div class="nba-detail">127 cancel callers/week. 68% saveable. Zero cost to implement. Policy decision only.</div>
+      <div class="nba-tags"><span class="tag tag-amber">Policy sign-off needed</span><span class="tag tag-muted">Subscription</span></div>
+    </div>
+    <div class="nba-impact"><div class="nba-impact-val val-green">$38k</div><div class="nba-impact-lbl">opp/week</div></div>
+  </div>
+
+  <div class="connector">Expansion opportunities — upsell and cross-sell signals.</div>
+  <div class="card" style="margin-bottom:10px">
+    <div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:6px">VOC Cluster — potential pipeline</div>
+    <div style="font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px">The upcoming VOC cluster would connect Bombas's internal contact data to external Trustpilot and review signals in a single dashboard — identifying brand reputation risks 3–4 weeks before they become critical. Current Trustpilot trajectory (3.6 and declining) is a direct revenue risk that the VOC cluster would make visible and actionable in real time.</div>
+    <div style="display:flex;gap:7px"><span class="tag tag-blue">VOC Cluster available</span><span class="tag tag-muted">Est. value: $120k/yr brand recovery</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- DRAWERS -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="main-drawer">
+<div class="drawer-header">
+<div class="drawer-title" id="drawer-title">Detail</div>
+<div class="drawer-close" onclick="closeDrawer()">✕</div>
+</div>
+<div id="drawer-content"></div>
+</div>
+<script>
+// ── CHART REGISTRY ──
+const C = {};
+function mkLine(id, labels, data, color) {
+  if (C[id]) C[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  C[id] = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ data, borderColor: color, backgroundColor: color + '18', borderWidth: 2, pointRadius: 2.5, pointBackgroundColor: color, tension: 0.4, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { grid: { color: '#f0f0ee' }, ticks: { font: { family: 'DM Sans', size: 10 }, color: '#9b9b9b' } }, y: { grid: { color: '#f0f0ee' }, ticks: { font: { family: 'DM Sans', size: 10 }, color: '#9b9b9b' } } } }
+  });
+}
+function mkDoughnut(id, data, colors, cutout, size) {
+  if (C[id]) C[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  C[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { datasets: [{ data, backgroundColor: colors, borderWidth: 0, borderRadius: 3 }] },
+    options: { responsive: false, cutout: cutout || '72%', plugins: { legend: { display: false } }, animation: { duration: 700 } }
+  });
+}
+function mkArc(id, value, color) {
+  if (C[id]) C[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  C[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { datasets: [{ data: [value, 100 - value], backgroundColor: [color, 'rgba(255,255,255,0.1)'], borderWidth: 0, borderRadius: 4 }] },
+    options: { responsive: false, cutout: '80%', circumference: 240, rotation: -120, plugins: { legend: { display: false } } }
+  });
+}
+
+// ── LABELS ──
+const wk8 = ['Wk 11', 'Wk 12', 'Wk 13', 'Wk 14', 'Wk 15', 'Wk 16', 'Wk 17', 'Wk 18'];
+const wk12 = ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+
+// ── INIT ALL CHARTS ──
+function initCharts() {
+  mkArc('score-ring', 54, '#f59e0b');
+  mkLine('chart-health',    wk12, [72, 70, 68, 66, 67, 65, 62, 60, 58, 57, 56, 54], '#c0392b');
+  mkLine('chart-returns',   wk8,  [152, 188, 214, 248, 310, 436, 538, 624], '#c0392b');
+  mkLine('chart-sentiment', wk8,  [72, 70, 69, 68, 67, 65, 63, 61], '#d97706');
+  mkDoughnut('cost-donut', [18600, 9200, 8400, 16200], ['#c0392b', '#d9534f', '#e8806f', '#f4b5aa']);
+  mkDoughnut('rev-donut',  [38200, 13800, 5700, 4100], ['#1a7a4a', '#228b5a', '#2fa870', '#5ac490']);
+  if (C['tp-trend']) C['tp-trend'].destroy();
+  const tpCtx = document.getElementById('tp-trend');
+  if (tpCtx) {
+    C['tp-trend'] = new Chart(tpCtx, {
+      type: 'line',
+      data: { labels: wk8, datasets: [{ data: [2.4, 2.2, 2.1, 2.0, 1.9, 1.8, 1.7, 1.6], borderColor: '#c0392b', borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: false }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false, min: 1.0, max: 3.0 } } }
+    });
+  }
+}
+
+// ── ASSUMPTIONS & RECALCULATE ──
+function getA() {
+  const g = id => parseFloat(document.getElementById(id)?.value) || 0;
+  return {
+    cpc:       g('input-cpc')   || 12,
+    ltv:       g('input-ltv')   || 180,
+    sub_ltv:   g('input-sub-ltv') || 320,
+    save_rate: (g('input-save') || 68) / 100,
+    churn_p:   (g('input-churn') || 14) / 100,
+    conv_rate: (g('input-conv') || 22) / 100
+  };
+}
+function fmt(n) { return '$' + Math.round(n).toLocaleString(); }
+function fmtM(n) { return n >= 1e6 ? '$' + (n / 1e6).toFixed(2) + 'M' : '$' + Math.round(n / 1000) + 'k'; }
+
+function recalculate() {
+  const a = getA();
+  const fulfilment_vol = 624, repeat_vol = 302, guarantee_vol = 181, unresolved = 214;
+  const sub_vol = 127, recovery_vol = 12, quality_recovery = 91, happy_vol = 94;
+
+  const cFulfil    = Math.round(fulfilment_vol * a.cpc * 2.5);
+  const cRepeat    = Math.round(repeat_vol * a.cpc);
+  const cGuarantee = Math.round(guarantee_vol * 18.5);
+  const cLtv       = Math.round(unresolved * a.churn_p * a.ltv);
+  const totalCost  = cFulfil + cRepeat + cGuarantee + cLtv;
+
+  const rSubs    = Math.round(sub_vol * a.save_rate * a.sub_ltv * 0.55);
+  const rRecov   = Math.round(recovery_vol * 0.55 * a.ltv * 8.5);
+  const rQual    = Math.round(quality_recovery * 0.30 * a.ltv * 0.7);
+  const rAdvoc   = Math.round(happy_vol * 0.25 * a.ltv * 0.18);
+  const totalRev = rSubs + rRecov + rQual + rAdvoc;
+  const net      = totalCost + totalRev;
+
+  const s = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  s('fin-cost-total',  fmt(totalCost));
+  s('leg-returns',     fmt(cFulfil));
+  s('leg-repeat',      fmt(cRepeat));
+  s('leg-guarantee',   fmt(cGuarantee));
+  s('leg-ltv-cost',    fmt(cLtv));
+  s('leg-annual-cost', fmtM(totalCost * 52));
+  s('fin-rev-total',   fmt(totalRev));
+  s('leg-subs',        fmt(rSubs));
+  s('leg-cross',       fmt(rRecov));
+  s('leg-recovery',    fmt(rQual));
+  s('leg-advocacy',    fmt(rAdvoc));
+  s('leg-annual-rev',  fmtM(totalRev * 52));
+  s('net-val',         fmt(net));
+  s('d-cost-total',    fmt(totalCost)); s('d-rev-total', fmt(totalRev));
+  s('d-cost-centre',   fmt(totalCost)); s('d-rev-centre', fmt(totalRev));
+  s('d-returns',       fmt(cFulfil));   s('d-repeat', fmt(cRepeat));
+  s('d-guarantee',     fmt(cGuarantee)); s('d-ltv', fmt(cLtv));
+  s('d-subs',          fmt(rSubs));     s('d-cross', fmt(rRecov));
+  s('d-recov',         fmt(rQual));     s('d-advoc', fmt(rAdvoc));
+  s('d-annual-cost',   'Annualised: ' + fmtM(totalCost * 52));
+  s('d-annual-rev',    'Annualised: ' + fmtM(totalRev * 52));
+  mkDoughnut('cost-donut', [cFulfil, cRepeat, cGuarantee, cLtv], ['#c0392b', '#d9534f', '#e8806f', '#f4b5aa']);
+  mkDoughnut('rev-donut',  [rSubs, rRecov, rQual, rAdvoc],        ['#1a7a4a', '#228b5a', '#2fa870', '#5ac490']);
+  if (document.getElementById('d-cost-donut')) mkDoughnut('d-cost-donut', [cFulfil, cRepeat, cGuarantee, cLtv], ['#c0392b', '#d9534f', '#e8806f', '#f4b5aa'], '68%');
+  if (document.getElementById('d-rev-donut'))  mkDoughnut('d-rev-donut',  [rSubs, rRecov, rQual, rAdvoc],       ['#1a7a4a', '#228b5a', '#2fa870', '#5ac490'], '68%');
+}
+
+// ── DRAWERS ──
+const DRAWERS = {
+  trends: {
+    title: 'Performance Trends — Detail',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Health Score · 12-week</div>
+        <div style="height:150px;position:relative"><canvas id="d-health"></canvas></div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Fulfilment Failure Contacts · 8-week</div>
+        <div style="height:150px;position:relative"><canvas id="d-returns"></canvas></div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">CS First Contact Resolution Rate · 8-week (%)</div>
+        <div style="height:150px;position:relative"><canvas id="d-sentiment"></canvas></div>
+      </div>
+      <div class="alert-box alert-red">The fulfilment contact spike began in Week 12 and has continued uninterrupted. The CS resolution rate decline mirrors it exactly — agents are handling more contacts under more pressure with less authority to resolve them. These two trends are connected.</div>`
+  },
+  cost: {
+    title: 'Cost Exposure — Full Breakdown',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">This Week · Total <span id="d-cost-total" style="color:var(--red)">calculating...</span></div>
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:14px">
+          <div style="position:relative;width:140px;height:140px;flex-shrink:0">
+            <canvas id="d-cost-donut" width="140" height="140"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:18px;font-weight:700;color:var(--red)" id="d-cost-centre">—</div>
+              <div style="font-size:10px;color:var(--light)">this week</div>
+            </div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:9px">
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-red" id="d-returns">—</div><div class="drawer-bucket-lbl">Fulfilment Failure</div><div class="drawer-bucket-formula">624 contacts × CPC × 2.5 handling multiplier</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-red" id="d-repeat">—</div><div class="drawer-bucket-lbl">CS Breakdown — Repeats</div><div class="drawer-bucket-formula">302 repeat contacts × CPC (unresolved first contacts)</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-red" id="d-guarantee">—</div><div class="drawer-bucket-lbl">Happiness Guarantee Failures</div><div class="drawer-bucket-formula">181 quality complaints × avg replacement cost</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-red" id="d-ltv">—</div><div class="drawer-bucket-lbl">LTV at Risk</div><div class="drawer-bucket-formula">214 unresolved × churn probability × annual LTV</div></div>
+          </div>
+        </div>
+        <div class="alert-box alert-red" id="d-annual-cost">Annualised: calculating...</div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Edit Assumptions — all figures update live</div>
+        <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:7px;padding:14px">
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Cost per contact (CPC)</div><div style="display:flex;align-items:center;gap:4px"><span style="font-size:12px;color:var(--muted)">$</span><input class="drawer-assumption-input" id="input-cpc" type="number" value="12" step="0.5" min="1" oninput="recalculate()"></div></div>
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Annual customer LTV</div><div style="display:flex;align-items:center;gap:4px"><span style="font-size:12px;color:var(--muted)">$</span><input class="drawer-assumption-input" id="input-ltv" type="number" value="180" step="10" min="50" oninput="recalculate()"></div></div>
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Churn probability per unresolved contact</div><div style="display:flex;align-items:center;gap:4px"><input class="drawer-assumption-input" id="input-churn" type="number" value="14" step="1" min="1" max="60" oninput="recalculate()"><span style="font-size:12px;color:var(--muted)">%</span></div></div>
+        </div>
+      </div>`
+  },
+  revenue: {
+    title: 'Revenue Opportunity — Full Breakdown',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">This Week · Total <span id="d-rev-total" style="color:var(--green)">calculating...</span></div>
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:14px">
+          <div style="position:relative;width:140px;height:140px;flex-shrink:0">
+            <canvas id="d-rev-donut" width="140" height="140"></canvas>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:18px;font-weight:700;color:var(--green)" id="d-rev-centre">—</div>
+              <div style="font-size:10px;color:var(--light)">this week</div>
+            </div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:9px">
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-green" id="d-subs">—</div><div class="drawer-bucket-lbl">Subscription Saves</div><div class="drawer-bucket-formula">127 cancel callers × 68% save rate × subscriber LTV</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-green" id="d-cross">—</div><div class="drawer-bucket-lbl">CS Recovery</div><div class="drawer-bucket-formula">High-LTV customers with poor CS experience · 55% recovery rate</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-green" id="d-recov">—</div><div class="drawer-bucket-lbl">Quality Complaint Recovery</div><div class="drawer-bucket-formula">Quality complainers resolved well → re-purchase window</div></div>
+            <div class="drawer-bucket"><div class="drawer-bucket-val val-green" id="d-advoc">—</div><div class="drawer-bucket-lbl">Advocacy Gap</div><div class="drawer-bucket-formula">94 satisfied contacts · not being converted to reviews</div></div>
+          </div>
+        </div>
+        <div class="alert-box alert-green" id="d-annual-rev">Annualised: calculating...</div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Edit Assumptions</div>
+        <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:7px;padding:14px">
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Subscription save rate</div><div style="display:flex;align-items:center;gap:4px"><input class="drawer-assumption-input" id="input-save" type="number" value="68" step="1" min="1" max="100" oninput="recalculate()"><span style="font-size:12px;color:var(--muted)">%</span></div></div>
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Subscriber annual LTV</div><div style="display:flex;align-items:center;gap:4px"><span style="font-size:12px;color:var(--muted)">$</span><input class="drawer-assumption-input" id="input-sub-ltv" type="number" value="320" step="10" min="50" oninput="recalculate()"></div></div>
+          <div class="drawer-assumption-row"><div class="drawer-assumption-lbl">Cross-sell conversion rate</div><div style="display:flex;align-items:center;gap:4px"><input class="drawer-assumption-input" id="input-conv" type="number" value="22" step="1" min="1" max="100" oninput="recalculate()"><span style="font-size:12px;color:var(--muted)">%</span></div></div>
+        </div>
+      </div>`
+  },
+  capacity: {
+    title: 'Workforce Signal — Operational Response Matrix',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Current Status · Week 18</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div style="background:#fffbeb;border:0.5px solid #fde68a;border-radius:7px;padding:12px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--amber)">Early Warning</div>
+            <div style="font-size:10px;color:var(--faint,#9b9b9b);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-top:2px">Queue Status</div>
+            <div style="font-size:11px;color:var(--amber);margin-top:3px">Wait time: 1m 42s</div>
+          </div>
+          <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:7px;padding:12px;text-align:center">
+            <div style="font-size:26px;font-weight:700;color:var(--dark)">44</div>
+            <div style="font-size:10px;color:var(--light);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-top:2px">Agents on voice</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">of 52 available · 8 on email</div>
+          </div>
+        </div>
+        <div class="alert-box alert-amber" style="margin-bottom:16px">
+          ⚠ Projected queue status: <strong>Warning</strong> (2 min wait) within 90 minutes if no shrinkage action is taken. Bombas notification (FYI only) will be required at that point. No approval needed at Warning — approval is required only if volume continues to Elevated (5 min).
+        </div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Operational Response Matrix — All Tiers</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">Each tier triggers when sustained over a 10-minute window. 87 FTE cap based on Erlang calculation to clear a 75-call queue within 30 minutes. A 10-minute delay at Critical stage adds approximately 50 additional calls to an already sustained queue.</div>
+
+        <div style="border:0.5px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:0">
+          <!-- Header -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;background:var(--dark);padding:10px 14px;gap:12px">
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em">Wait Time</div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em">Status</div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em">Actions Triggered</div>
+            <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.07em">Approval</div>
+          </div>
+          <!-- Normal -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:var(--white);border-left:3px solid #1a7a4a">
+            <div style="font-size:12px;font-weight:500;color:var(--dark)">&lt;20 sec</div>
+            <div><span class="tag tag-green">Normal</span></div>
+            <div style="font-size:12px;color:var(--muted)">None</div>
+            <div style="font-size:12px;color:var(--muted)">None</div>
+          </div>
+          <!-- Early Warning — ACTIVE -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:#fffbeb;border-left:3px solid #d97706">
+            <div style="font-size:12px;font-weight:600;color:var(--dark)">20 sec – 2 min<div style="font-size:10px;font-weight:700;color:var(--amber);margin-top:2px">▶ ACTIVE NOW</div></div>
+            <div><span class="tag tag-amber">Early Warning</span></div>
+            <div style="font-size:12px;color:var(--dark);line-height:1.6">1. Shrinkage gets optimised<br>2. IVR message — average wait time<br>3. TLs, QAs, Trainers start taking calls</div>
+            <div style="font-size:12px;color:var(--muted)">Internal only</div>
+          </div>
+          <!-- Warning -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:var(--white);border-left:3px solid #f97316">
+            <div style="font-size:12px;font-weight:500;color:var(--dark)">2 min<div style="font-size:10px;color:var(--muted);margin-top:2px">(20% of AHT)</div></div>
+            <div><span class="tag" style="background:#fff7ed;color:#c2410c;border:0.5px solid #fed7aa">Warning</span></div>
+            <div style="font-size:12px;color:var(--dark);line-height:1.6">4. All shrinkage cancelled for 1 hr<br>5. IVR — longer wait + deflect to chat<br>6. QueueBuster activated (callback option)</div>
+            <div style="font-size:12px;color:var(--muted)">Internal only<br><span style="color:var(--amber);font-weight:600">Bombas notified FYI</span></div>
+          </div>
+          <!-- Elevated -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:var(--white);border-left:3px solid #ea580c">
+            <div style="font-size:12px;font-weight:500;color:var(--dark)">5 min<div style="font-size:10px;color:var(--muted);margin-top:2px">(50% of AHT)</div></div>
+            <div><span class="tag" style="background:#fff0e6;color:#c2410c;border:0.5px solid #fdba74">Elevated</span></div>
+            <div style="font-size:12px;color:var(--dark);line-height:1.6">7. Move 10 agents from email to voice</div>
+            <div style="font-size:12px;color:var(--muted)">Internal only<br><span style="color:var(--amber);font-weight:600">Bombas notified FYI</span></div>
+          </div>
+          <!-- Critical -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:#fef2f2;border-left:3px solid var(--red)">
+            <div style="font-size:12px;font-weight:500;color:var(--dark)">10 min<div style="font-size:10px;color:var(--muted);margin-top:2px">(100% of AHT)</div></div>
+            <div><span class="tag tag-red">Critical</span></div>
+            <div style="font-size:12px;color:var(--dark);line-height:1.6">8. Move another 10 agents email→voice<br>9. Shrinkage cancelled for another hour<br>10. Agents asked for voluntary overtime through breaks &amp; lunches</div>
+            <div style="font-size:12px;font-weight:600;color:var(--red)">Bombas approval needed</div>
+          </div>
+          <!-- Severe -->
+          <div style="display:grid;grid-template-columns:130px 90px 1fr 130px;padding:12px 14px;gap:12px;border-top:0.5px solid var(--border);background:#fef2f2;border-left:3px solid #991b1b;border-radius:0 0 8px 0">
+            <div style="font-size:12px;font-weight:500;color:var(--dark)">15 min<div style="font-size:10px;color:var(--muted);margin-top:2px">(150% of AHT)</div></div>
+            <div><span class="tag" style="background:#fef2f2;color:#7f1d1d;border:0.5px solid #fca5a5">Severe</span></div>
+            <div style="font-size:12px;color:var(--dark);line-height:1.6">11. Move another 7 agents from email to voice</div>
+            <div style="font-size:12px;font-weight:600;color:var(--red)">Bombas approval needed</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.5">87 FTE cap based on Erlang calculation to clear 75-call queue within 30 minutes. Approval is sought from Bombas simultaneously with actions taken. A 10-minute delay in approval at Critical stage = approximately 50 additional calls joining an already sustained queue.</div>
+      </div>`
+  },
+  product: {
+    title: 'Product Intelligence — Contact Driver Deep Dive',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Top 5 contact drivers · Week 18 · 3,241 total contacts</div>
+        <div class="alert-box alert-red" style="margin-bottom:14px">
+          <strong>Fulfilment failure contacts are 4.1× the 8-week baseline.</strong> 624 contacts this week from customers whose orders were not received or not acknowledged. This is the dominant cost driver and is entirely outside the contact centre's ability to resolve — it requires an executive decision on the fulfilment pipeline.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0;border:0.5px solid var(--border);border-radius:8px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:10px 14px;background:var(--bg);border-bottom:0.5px solid var(--border)">
+            <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.07em">#</div>
+            <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.07em">Contact Driver</div>
+            <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.07em">Volume</div>
+            <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.07em">Trend</div>
+            <div style="font-size:10px;font-weight:700;color:var(--light);text-transform:uppercase;letter-spacing:0.07em">Category</div>
+          </div>
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border);background:#fef2f2">
+            <div style="font-size:12px;font-weight:700;color:var(--red)">1</div>
+            <div style="font-size:12px;color:var(--dark);font-weight:500">Order not received / fulfilment delay</div>
+            <div style="font-size:13px;font-weight:700;color:var(--red)">624</div>
+            <div><span class="tag tag-red">↑ 4.1×</span></div>
+            <div style="font-size:11px;color:var(--red);font-weight:600">Ops issue</div>
+          </div>
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--red)">2</div>
+            <div style="font-size:12px;color:var(--dark);font-weight:500">CS unresolved — callback on same issue</div>
+            <div style="font-size:13px;font-weight:700;color:var(--red)">302</div>
+            <div><span class="tag tag-red">↑ Structural</span></div>
+            <div style="font-size:11px;color:var(--red);font-weight:600">Policy gap</div>
+          </div>
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--amber)">3</div>
+            <div style="font-size:12px;color:var(--dark);font-weight:500">Quality / durability complaint</div>
+            <div style="font-size:13px;font-weight:700;color:var(--amber)">181</div>
+            <div><span class="tag tag-amber">↑ +34% WoW</span></div>
+            <div style="font-size:11px;color:var(--amber);font-weight:600">Product</div>
+          </div>
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:12px 14px;border-bottom:0.5px solid var(--border)">
+            <div style="font-size:12px;font-weight:700;color:var(--muted)">4</div>
+            <div style="font-size:12px;color:var(--dark);font-weight:500">Sizing / fit — return or exchange</div>
+            <div style="font-size:13px;font-weight:700;color:var(--dark)">127</div>
+            <div><span class="tag tag-green">Stable</span></div>
+            <div style="font-size:11px;color:var(--muted)">Product</div>
+          </div>
+          <div style="display:grid;grid-template-columns:20px 1fr 60px 80px 70px;gap:10px;padding:12px 14px">
+            <div style="font-size:12px;font-weight:700;color:var(--muted)">5</div>
+            <div style="font-size:12px;color:var(--dark);font-weight:500">Subscription cancel / pause request</div>
+            <div style="font-size:13px;font-weight:700;color:var(--dark)">127</div>
+            <div><span class="tag tag-amber">↑ Signal</span></div>
+            <div style="font-size:11px;color:var(--green);font-weight:600">Saveable</div>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">What this tells you about your business</div>
+        <div class="drawer-verbatim" style="border-color:#fecaca;background:#fef2f2"><div class="drawer-verbatim-quote" style="font-style:normal;font-size:13px;color:var(--dark)"><strong>Issue 1 and 2 are connected.</strong> Fulfilment failures generate the first contact. CS inability to resolve it generates the second. The 302 repeat contacts this week are almost entirely customers whose original fulfilment query was not resolved. Fix the fulfilment pipeline and the repeat contact volume collapses with it.</div></div>
+        <div class="drawer-verbatim" style="border-color:#fde68a;background:#fffbeb"><div class="drawer-verbatim-quote" style="font-style:normal;font-size:13px;color:var(--dark)"><strong>Issue 3 is independent and growing.</strong> Quality complaint volume has been rising for 5 consecutive weeks. Customers are explicitly using language like "noticeably thinner," "holes after a few washes," and "not like the old ones." This language is consistent with a material formulation change — not a single batch issue. If confirmed, this needs a product decision, not a contact centre intervention.</div></div>
+      </div>`
+  },
+  decisions: {
+    title: 'This week\'s action picture — Decisions Required',
+    html: `
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:16px">These three issues cannot be resolved operationally. Each needs a client-side decision before the recommended action can move forward.</div>
+      <div class="drawer-dec" style="border-left:3px solid var(--red) !important">
+        <div class="drawer-dec-title">Authorise fulfilment pipeline investigation and pause affected dispatches.</div>
+        <div class="drawer-dec-why">624 contacts came from customers whose orders were not received. The contact centre can absorb the volume, but it cannot fix the fulfilment root cause. This has been the primary driver for six consecutive weeks.</div>
+        <div class="drawer-dec-footer" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="tag tag-red">Operations decision</span><span class="tag tag-muted">624 contacts/wk</span><span class="drawer-dec-impact" style="color:var(--red)">$52,400/wk cost of inaction</span></div>
+      </div>
+      <div class="drawer-dec" style="border-left:3px solid var(--amber) !important">
+        <div class="drawer-dec-title">Create a human escalation path for customers stuck in the CS loop.</div>
+        <div class="drawer-dec-why">178 contacts explicitly mentioned automated replies that did not address the issue. Without a human escalation route, unresolved cases become repeat contacts and continue to depress FCR.</div>
+        <div class="drawer-dec-footer" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="tag tag-amber">Policy decision</span><span class="tag tag-muted">302 repeat contacts/wk</span><span class="drawer-dec-impact" style="color:var(--amber)">FCR gap: $9,200/wk</span></div>
+      </div>
+      <div class="drawer-dec" style="border-left:3px solid var(--purple) !important">
+        <div class="drawer-dec-title">Initiate a product materials review for the quality complaint spike.</div>
+        <div class="drawer-dec-why">Quality complaints are up 34% WoW, with customers repeatedly describing thinner or less durable material. The pattern suggests a product/material issue rather than a coachable contact-centre behaviour.</div>
+        <div class="drawer-dec-footer" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><span class="tag tag-purple">Product decision</span><span class="tag tag-muted">181 contacts/wk ↑ 34%</span><span class="drawer-dec-impact" style="color:var(--purple)">$8,400/wk guarantee cost</span></div>
+      </div>`
+  },
+  nba: {
+    title: 'Action Effectiveness — Full Tracker',
+    html: `
+      <div class="drawer-nba">
+        <div class="drawer-nba-bar" style="background:var(--green)"></div>
+        <div class="drawer-nba-body">
+          <div class="drawer-nba-week">Wk 14 · Actioned &amp; Measured</div>
+          <div class="drawer-nba-title">Donation FAQ deployed — structured response to "where did my donated pair go?" contacts</div>
+          <div class="drawer-nba-outcome">Handle time on donation contacts reduced from 8.2 min to 2.1 min. CSAT on these calls: 4.9/5.</div>
+          <div style="display:flex;gap:6px"><span class="tag tag-green">Delivered</span><span class="tag tag-muted">Knowledge Mgmt</span></div>
+        </div>
+        <div class="drawer-nba-right"><div class="drawer-nba-impact val-green">$4,100</div><div class="drawer-nba-lbl">saved/wk</div></div>
+      </div>
+      <div class="drawer-nba">
+        <div class="drawer-nba-bar" style="background:var(--green)"></div>
+        <div class="drawer-nba-body">
+          <div class="drawer-nba-week">Wk 16 · Actioned &amp; Measured</div>
+          <div class="drawer-nba-title">IVR queue message updated to reflect current wait times and offer chat deflection at Warning status</div>
+          <div class="drawer-nba-outcome">Queue load reduced by 18% at Warning threshold. Customer deflection rate to chat: 22% of IVR contacts.</div>
+          <div style="display:flex;gap:6px"><span class="tag tag-green">Delivered</span><span class="tag tag-muted">Ops Lead</span></div>
+        </div>
+        <div class="drawer-nba-right"><div class="drawer-nba-impact val-green">−18%</div><div class="drawer-nba-lbl">queue load</div></div>
+      </div>
+      <div class="drawer-nba">
+        <div class="drawer-nba-bar" style="background:var(--amber)"></div>
+        <div class="drawer-nba-body">
+          <div class="drawer-nba-week">Wk 17 · In Progress</div>
+          <div class="drawer-nba-title">AI triage improvement — routing critical CS failures (unresolved repeats) to human agent rather than AI loop</div>
+          <div class="drawer-nba-outcome">Currently in configuration. Expected to improve FCR by ~12pp on affected contacts. Impact visible from Wk 20.</div>
+          <div style="display:flex;gap:6px"><span class="tag tag-amber">In Progress</span><span class="tag tag-muted">CX Tech</span></div>
+        </div>
+        <div class="drawer-nba-right"><div class="drawer-nba-impact val-amber">FCR +12pp</div><div class="drawer-nba-lbl">projected</div></div>
+      </div>
+      <div class="drawer-nba">
+        <div class="drawer-nba-bar" style="background:var(--red)"></div>
+        <div class="drawer-nba-body">
+          <div class="drawer-nba-week">Wk 12 · Pending — 6 weeks · blocked on executive decision</div>
+          <div class="drawer-nba-title">Fulfilment pipeline investigation — requires executive authorisation to proceed</div>
+          <div class="drawer-nba-outcome">624 contacts/week. Estimated accumulated cost since Week 12: $314,400. See Decisions panel.</div>
+          <div style="display:flex;gap:6px"><span class="tag tag-red">Blocked</span><span class="tag tag-muted">Awaiting exec sign-off</span></div>
+        </div>
+        <div class="drawer-nba-right"><div class="drawer-nba-impact val-red">$52k</div><div class="drawer-nba-lbl">per week</div></div>
+      </div>`
+  },
+  voc: {
+    title: 'Voice of Customer — All Signals',
+    html: `
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">Internal — what customers are saying in contacts this week</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:7px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--red)">31%</div><div style="font-size:10px;color:var(--light);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Frustration rate</div><div style="font-size:11px;color:var(--red);margin-top:3px">↑ +8pp WoW</div></div>
+          <div style="background:var(--bg);border:0.5px solid var(--border);border-radius:7px;padding:12px;text-align:center"><div style="font-size:26px;font-weight:700;color:var(--amber)">58%</div><div style="font-size:10px;color:var(--light);text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Resolution confidence</div><div style="font-size:11px;color:var(--amber);margin-top:3px">↓ −9pp WoW</div></div>
+        </div>
+        <div class="drawer-verbatim"><div class="drawer-verbatim-quote">"I\'ve been waiting three weeks and nobody has responded to my emails"</div><div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">214 contacts</span><span class="tag tag-red">↑ +140 WoW</span><span class="tag tag-amber">Fulfilment</span></div></div>
+        <div class="drawer-verbatim"><div class="drawer-verbatim-quote">"I think the reply is AI — it didn\'t even read what I wrote"</div><div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">178 contacts</span><span class="tag tag-red">CS breakdown</span></div></div>
+        <div class="drawer-verbatim"><div class="drawer-verbatim-quote">"These are noticeably thinner than the ones I bought two years ago"</div><div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">91 contacts</span><span class="tag tag-amber">↑ +34% WoW</span><span class="tag tag-amber">Quality signal</span></div></div>
+        <div class="drawer-verbatim"><div class="drawer-verbatim-quote">"I just want to pause, not cancel — I didn\'t know that was an option"</div><div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">43 contacts</span><span class="tag tag-green">Save signal</span></div></div>
+        <div class="drawer-verbatim" style="border-color:#bbf7d0;background:#f0fdf4"><div class="drawer-verbatim-quote" style="color:var(--green)">"Do the underwear hold up better than the socks?"</div><div class="drawer-verbatim-meta"><span class="drawer-verbatim-count">58 contacts</span><span class="tag tag-green">↑ Cross-sell signal</span></div></div>
+      </div>
+      <div class="drawer-section">
+        <div class="drawer-section-lbl">External — Trustpilot and reputation signals</div>
+        <div style="background:#fef2f2;border:0.5px solid #fecaca;border-radius:7px;padding:14px;margin-bottom:10px">
+          <div style="font-size:28px;font-weight:800;color:var(--red);letter-spacing:-1px;margin-bottom:4px">1.6 / 5</div>
+          <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">Rated "Bad" · 9,000+ reviews · Trustpilot</div>
+          <div style="font-size:12px;color:var(--dark);line-height:1.55">Dominant negative themes: delivery/fulfilment failures (41% of negative reviews), CS unresponsiveness (34%), quality decline (18%). This reflects a sustained operational pattern — not a seasonal spike — and is now fully visible to potential new customers researching the brand before purchase.</div>
+        </div>
+        <div class="drawer-verbatim" style="border-color:#fecaca;background:#fef2f2"><div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Internal &amp; External Signals Fully Aligned</div><div class="drawer-verbatim-quote" style="font-style:normal;font-size:13px;color:var(--dark)">The same three issues driving internal contacts — fulfilment failure, CS breakdown, quality decline — are the three dominant themes in public Trustpilot reviews. The contact centre data is surfacing the same themes that show up on Trustpilot 3–4 weeks later. This is the early-warning capability in action.</div></div>
+        <div class="drawer-verbatim" style="border-color:#bbf7d0;background:#f0fdf4"><div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">Advocacy Capture Gap</div><div class="drawer-verbatim-quote" style="font-style:normal;font-size:13px;color:var(--dark)">94 contacts this week ended with genuine customer satisfaction. Trustpilot received 6 positive reviews. A post-resolution review prompt triggered for contacts with 4–5 CSAT scores would directly offset the negative review trajectory. This is a low-effort, high-impact fix that requires no executive decision.</div></div>
+      </div>`
+  },
+  watch: {
+    title: 'What to Watch — Emerging Signals',
+    html: `
+      <div style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:16px">These signals are not yet at decision threshold but are trending in a direction that warrants awareness. Once any signal crosses the threshold, it should move into the Decisions Required panel.</div>
+      <div class="drawer-watch" style="padding:14px 0;border-bottom:0.5px solid var(--border);display:flex;gap:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:4px"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:4px">Trustpilot at 1.6 — fulfilment and CS themes now fully dominating public reviews</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px">The rating has declined from 2.4 over 8 weeks. At this trajectory it will reach 1.3 within 4 weeks. A sub-1.5 rating materially affects new customer conversion — potential customers researching the brand before purchase will see this score prominently. Reputation damage is now compounding weekly.</div>
+          <div style="display:flex;gap:8px"><span class="tag tag-red">High confidence</span><span class="tag tag-muted">Reputation risk · compounding</span></div>
+        </div>
+      </div>
+      <div class="drawer-watch" style="padding:14px 0;border-bottom:0.5px solid var(--border);display:flex;gap:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:4px"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:4px">Quality complaint language now appearing on Trustpilot — material change reaching public discourse</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px">Customers are using identical language in both contacts and public reviews: "thinner than before," "holes after a few washes," "not like the old ones." Once this language is established publicly, it becomes brand-defining. A product investigation now is significantly cheaper than a public recall or brand rehabilitation campaign later.</div>
+          <div style="display:flex;gap:8px"><span class="tag tag-amber">Medium confidence</span><span class="tag tag-muted">Product team input needed</span></div>
+        </div>
+      </div>
+      <div class="drawer-watch" style="padding:14px 0;display:flex;gap:12px">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--light);flex-shrink:0;margin-top:4px"></div>
+        <div>
+          <div style="font-size:13px;font-weight:500;color:var(--dark);margin-bottom:4px">Queue approaching Warning threshold — 90-minute projection at current contact volume</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:6px">Current wait time is 1m 42s against a 2-minute Warning trigger. If volume holds, Bombas will receive an FYI notification within 90 minutes. No approval needed at Warning — but the trajectory suggests Elevated (5 min, approval required) is possible later in the day if volume spikes.</div>
+          <div style="display:flex;gap:8px"><span class="tag tag-muted">Low urgency now · Monitor</span></div>
+        </div>
+      </div>`
+  }
+};
+
+
+function openDrawer(key) {
+  const d = DRAWERS[key];
+  if (!d) return;
+  document.getElementById('drawer-title').textContent = d.title;
+  document.getElementById('drawer-content').innerHTML = d.html;
+  document.getElementById('main-drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+  setTimeout(() => {
+    if (key === 'trends') {
+      mkLine('d-health',    wk12, [72,70,68,66,67,65,62,60,58,57,56,54], '#c0392b');
+      mkLine('d-returns',   wk8,  [210,228,247,265,318,364,495,584], '#c0392b');
+      mkLine('d-sentiment', wk8,  [4.1,4.0,3.9,3.9,3.8,3.7,3.6,3.6], '#d97706');
+    }
+    if (key === 'cost')    { recalculate(); }
+    if (key === 'revenue') { recalculate(); }
+  }, 80);
+}
+
+function closeDrawer() {
+  document.getElementById('main-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+
+// ── MODULE MENU ──
+const moduleMenuTrigger = document.getElementById('module-menu-trigger');
+const moduleMenu = document.getElementById('module-menu');
+if (moduleMenuTrigger && moduleMenu) {
+  moduleMenuTrigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = moduleMenu.classList.toggle('open');
+    moduleMenuTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  document.addEventListener('click', (event) => {
+    if (!moduleMenu.contains(event.target) && !moduleMenuTrigger.contains(event.target)) {
+      moduleMenu.classList.remove('open');
+      moduleMenuTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      moduleMenu.classList.remove('open');
+      moduleMenuTrigger.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// ── PAGE SWITCHER ──
+const PAGE_LABELS = { exec: 'Executive', ops: 'Ops Manager', qa: 'QA Analyst', teamlead: 'Team Lead', agent: 'Agent', am: 'Account Manager' };
+function showPage(id) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const lbl = document.getElementById('nav-page-label');
+  if (lbl) lbl.textContent = PAGE_LABELS[id] || id;
+  // close menu
+  if (moduleMenu) { moduleMenu.classList.remove('open'); moduleMenuTrigger.setAttribute('aria-expanded','false'); }
+  window.scrollTo(0, 0);
+  // init charts for that page
+  setTimeout(() => {
+    const wk8 = ['Wk11','Wk12','Wk13','Wk14','Wk15','Wk16','Wk17','Wk18'];
+    if (id === 'ops') {
+      mkLine('ops-chart-returns', wk8, [210,228,247,265,318,364,495,584], '#c0392b');
+    }
+  }, 80);
+}
+
+// ── PERIOD TABS ──
+function switchPeriod(btn, targetId) {
+  const siblings = btn.parentElement.querySelectorAll('.period-tab');
+  siblings.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // hide all period panels in same page
+  const page = btn.closest('.page');
+  page.querySelectorAll('[id^="ops-wbr"],[id^="ops-mbr"],[id^="ops-qbr"],[id^="ops-ybr"]').forEach(el => el.style.display = 'none');
+  const target = document.getElementById(targetId);
+  if (target) target.style.display = 'block';
+  // init chart for mbr
+  setTimeout(() => {
+    if (targetId === 'ops-mbr') {
+      mkLine('ops-mbr-chart', ['Wk 15 (7 Apr)','Wk 16 (14 Apr)','Wk 17 (21 Apr)','Wk 18 (28 Apr)'], [318, 364, 495, 584], '#c0392b');
+    }
+  }, 80);
+}
+
+// ── START ──
+window.addEventListener('load', () => {
+  initCharts();
+});
+</script>
+</body>
+</html>
